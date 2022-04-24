@@ -20,24 +20,25 @@ class Solution {
     // Sliding window initialisation
     uint16_t slide_start = 0;
     uint16_t slide_end = p.length() - 1;
+    uint16_t freq_copy[26] = {0};
+    for (uint16_t i = slide_start; i <= slide_end; ++i) {
+      ++freq_copy[to_idx(s.at(i))];
+    }
 
     // while loop for sliding window
     while (slide_end < s.length()) {
-      // copied instance of freq_table
-      uint16_t freq_copy[26];
-      std::copy(std::begin(freq_table), std::end(freq_table), std::begin(freq_copy));
-
-      // loop through sliding window and decrement frequency for corresponding letter
-      for (uint16_t i = slide_start; i <= slide_end; ++i) {
-        --freq_copy[to_idx(s.at(i))];
-      }
-
-      if (is_all_zeroes(freq_copy, 26)) {
-        ret.push_back((int)slide_start);
+      // loop through sliding window
+      if (is_equal(freq_table, freq_copy, 26)) {
+        ret.push_back(slide_start);
       }
 
       ++slide_start;
       ++slide_end;
+
+      --freq_copy[to_idx(s.at(slide_start - 1))];
+      if (slide_end < s.length()) {
+        ++freq_copy[to_idx(s.at(slide_end))];
+      }
     }
 
     return ret;
@@ -52,9 +53,9 @@ class Solution {
     return (char)(idx + 97);
   }
 
-  bool is_all_zeroes(uint16_t* arr, uint16_t len) {
+  bool is_equal(uint16_t* arr, uint16_t* arr2, uint16_t len) {
     for (uint16_t i = 0; i < len; i++) {
-      if (arr[i] != 0) {
+      if (arr[i] != arr2[i]) {
         return false;
       }
     }
