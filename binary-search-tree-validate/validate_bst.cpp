@@ -14,38 +14,26 @@ struct TreeNode {
 
 class Solution {
    public:
+    // using in-order traversal to validate if traversed is, well, in-order
     bool isValidBST(TreeNode *root) {
-        return is_valid_helper(root, (1 << 31), ~(1 << 31));
+        TreeNode *prev = nullptr;
+        return is_valid_helper(root, prev);
     }
 
    private:
-    bool is_valid_helper(TreeNode *cur_node, int lower_bound, int upper_bound) {
-        // we manage to reach a null node without running into problems
-        // so we can cascade validity upwards
+    bool is_valid_helper(TreeNode *cur_node, TreeNode *&prev) {
         if (cur_node == nullptr) {
             return true;
         }
 
-        // Edge cases
-        if (root->val == ~(1 << 31)) {
-            if (root->right != nullptr) {
-                return false;
-            }
-            return true;
-        }
-
-        if (root->val == (1 << 31)) {
-            if (root->left != nullptr) {
-                return false;
-            }
-            return true;
-        }
-
-        if (cur_node->val <= lower_bound || cur_node->val >= upper_bound) {
+        if (!is_valid_helper(cur_node->left, prev)) {
             return false;
         }
-
-        return (is_valid_helper(cur_node->left, lower_bound, cur_node->val) && is_valid_helper(cur_node->right, cur_node->val, upper_bound));
+        if (prev != nullptr && prev->val >= cur_node->val) {
+            return false;
+        }
+        prev = cur_node;
+        return is_valid_helper(cur_node->right, prev);
     }
 };
 
