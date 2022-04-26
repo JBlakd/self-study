@@ -1,4 +1,5 @@
 #include <iostream>
+#include <queue>
 #include <vector>
 
 using namespace std;
@@ -20,12 +21,24 @@ class Solution {
             return nullptr;
         }
 
-        TreeNode *left_temp = root->left;
-        root->left = root->right;
-        root->right = left_temp;
+        queue<TreeNode *> q;
+        q.push(root);
 
-        invertTree(root->left);
-        invertTree(root->right);
+        while (!q.empty()) {
+            TreeNode *cur_node = q.front();
+            q.pop();
+            if (cur_node->left != nullptr) {
+                q.push(cur_node->left);
+            }
+            if (cur_node->right != nullptr) {
+                q.push(cur_node->right);
+            }
+
+            TreeNode *left_temp = cur_node->left;
+            cur_node->left = cur_node->right;
+            cur_node->right = left_temp;
+        }
+
         return root;
     }
 };
