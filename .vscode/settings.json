@@ -18,7 +18,9 @@
         "istream": "cpp",
         "memory": "cpp",
         "type_traits": "cpp",
-        "xlocnum": "cpp"
+        "xlocnum": "cpp",
+        "xhash": "cpp",
+        "unordered_set": "cpp"
     },
     "editor.formatOnSave": true,
     "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 0}"
