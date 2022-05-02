@@ -16,35 +16,75 @@ struct TreeNode {
 class Solution {
    public:
     int maxDepth(TreeNode *root) {
+        // base case
         if (root == nullptr) {
             return 0;
         }
 
-        queue<TreeNode *> q;
-        int depth = 1;
-
-        q.push(root);
-        while (!q.empty()) {
-            // This loop is key to ensure we do all the nodes of each level before moving on to the next one
-            int q_size = q.size();
-            for (int i = 0; i < q_size; i++) {
-                TreeNode *cur_node = q.front();
-                q.pop();
-
-                if (cur_node->left != nullptr) {
-                    q.push(cur_node->left);
-                }
-                if (cur_node->right != nullptr) {
-                    q.push(cur_node->right);
-                }
-            }
-            depth++;
-        }
-
-        return depth;
+        return 1 + max(maxDepth(root->left), maxDepth(root->right));
     }
 };
 
 int main() {
     Solution solution;
+    vector<TreeNode *> input;
+    vector<int> node_vals;
+
+    node_vals = {3, 9, 20, -1, -1, 15, 7};
+    // Node initialisation
+    for (int val : node_vals) {
+        if (val == -1) {
+            input.push_back(nullptr);
+            continue;
+        }
+        TreeNode *cur_node = new TreeNode(val);
+        input.push_back(cur_node);
+    }
+    // Node connection
+    for (int i = 0; i < input.size(); ++i) {
+        int left_index = (i + 1) * 2 - 1;
+        int right_index = (i + 1) * 2;
+
+        if (input[i] == nullptr) {
+            continue;
+        }
+
+        if (left_index < input.size()) {
+            input[i]->left = input[left_index];
+        }
+        if (right_index < input.size()) {
+            input[i]->right = input[right_index];
+        }
+    }
+    cout << solution.maxDepth(input[0]) << endl;
+    for (auto node : input) {
+        delete node;
+    }
+    input.clear();
+    node_vals.clear();
+
+    node_vals = {1, 2};
+    // Node initialisation
+    for (int val : node_vals) {
+        TreeNode *cur_node = new TreeNode(val);
+        input.push_back(cur_node);
+    }
+    // Node connection
+    for (int i = 0; i < input.size(); ++i) {
+        int left_index = (i + 1) * 2 - 1;
+        int right_index = (i + 1) * 2;
+
+        if (left_index < input.size()) {
+            input[i]->left = input[left_index];
+        }
+        if (right_index < input.size()) {
+            input[i]->right = input[right_index];
+        }
+    }
+    cout << solution.maxDepth(input[0]) << endl;
+    for (auto node : input) {
+        delete node;
+    }
+    input.clear();
+    node_vals.clear();
 }
