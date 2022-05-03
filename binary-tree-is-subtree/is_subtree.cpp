@@ -26,7 +26,7 @@ class Solution {
             return true;
         }
 
-        return (is_identical(root->left, subRoot) || is_identical(root->right, subRoot));
+        return (isSubtree(root->left, subRoot) || isSubtree(root->right, subRoot));
     }
 
    private:
