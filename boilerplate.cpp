@@ -7,5 +7,5 @@ class Solution {
 };
 
 int main() {
-  Solution solution;
+    Solution solution;
 }
