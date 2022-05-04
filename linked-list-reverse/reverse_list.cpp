@@ -22,6 +22,7 @@ class Solution {
             ListNode* ret = head->next;
             ret->next = head;
             head->next = nullptr;
+            return ret;
         }
 
         // iterative solution
