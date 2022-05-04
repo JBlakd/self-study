@@ -83,7 +83,7 @@ int main() {
     nums = {1, 2, 4, 5, 3};
     cout << solution.findUnsortedSubarray(nums) << endl;
 
-    // 2    b  f
+    // 2
     nums = {2, 1};
     cout << solution.findUnsortedSubarray(nums) << endl;
 
@@ -95,19 +95,19 @@ int main() {
     nums = {2};
     cout << solution.findUnsortedSubarray(nums) << endl;
 
-    // 0    b  f
+    // 0
     nums = {1, 2};
     cout << solution.findUnsortedSubarray(nums) << endl;
 
-    // 0    b        f
+    // 0
     nums = {1, 2, 3, 4};
     cout << solution.findUnsortedSubarray(nums) << endl;
 
-    // 2       b  f
+    // 2
     nums = {2, 6, 4, 8, 9, 10, 15};
     cout << solution.findUnsortedSubarray(nums) << endl;
 
-    // 5          f     b
+    // 5
     nums = {2, 6, 4, 8, 10, 9, 15};
     cout << solution.findUnsortedSubarray(nums) << endl;
 }
