@@ -10,35 +10,28 @@ class KthLargest {
         this->k = k;
         for (int num : nums) {
             pq.push(num);
+            // At all times we only keep the k biggest elements
+            // Since this is a MIN pq, the k-th biggest element always remains at the top
+            if (pq.size() > k) {
+                pq.pop();
+            }
         }
     }
 
     int add(int val) {
         pq.push(val);
-
-        // Reserve some space for popped elements
-        vector<int> temp(k - 1);
-
-        // Pop k-1 elements to reveak k-th element
-        for (int i = 0; i < k - 1; ++i) {
-            temp[i] = pq.top();
+        // At all times we only keep the k biggest elements
+        if (pq.size() > k) {
             pq.pop();
         }
-
-        // Store k-th element
-        int ret = pq.top();
-
-        // Restore pq
-        for (int num : temp) {
-            pq.push(num);
-        }
-
-        return ret;
+        // Since this is a MIN pq, the k-th biggest element always remains at the top
+        return pq.top();
     }
 
    private:
     int k;
-    priority_queue<int> pq;
+    // MIN pq
+    priority_queue<int, vector<int>, greater<int>> pq;
 };
 
 int main() {
