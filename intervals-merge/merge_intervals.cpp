@@ -14,6 +14,7 @@ class Solution {
 
         // Custom lambda function to sort vectors based on size of first element
         // sort(intervals.begin(), intervals.end(), [](vector<int> left, vector<int> right) { return (left[0] < right[0]); });
+        // no need for lambda function? it does what I want by default?
         sort(intervals.begin(), intervals.end());
 
         vector<vector<int>> ret;
@@ -23,12 +24,9 @@ class Solution {
         while (i < intervals.size()) {
             // vector<int> cur_interval = intervals[i];
 
-            if (intervals[i][0] <= merged_interval[1] && intervals[i][1] > merged_interval[1]) {
+            if (intervals[i][0] <= merged_interval[1]) {
                 // If intervals[i] overlaps with existing interval, and intervals[i] ends after existing
-                merged_interval[1] = intervals[i][1];
-            } else if (intervals[i][0] <= merged_interval[1] && intervals[i][1] <= merged_interval[1]) {
-                // If existing interval completely encompasses intervals[i]
-                // do nothing
+                merged_interval[1] = max(intervals[i][1], merged_interval[1]);
             } else {
                 // No overlap, push previous merged_interval into ret
                 ret.push_back(merged_interval);
