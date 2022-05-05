@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <queue>
 #include <vector>
@@ -11,39 +12,30 @@ class Solution {
             return {};
         }
 
-        // Custom lambda function enabling min priority queue to sort vectors based on size of first element
-        auto cmp = [](vector<int> left, vector<int> right) { return (left[0] > right[0]); };
-        priority_queue<vector<int>, vector<vector<int>>, decltype(cmp)> min_pq(cmp);
-        for (auto& interval : intervals) {
-            min_pq.push(interval);
-        }
+        // Custom lambda function to sort vectors based on size of first element
+        sort(intervals.begin(), intervals.end(), [](vector<int> left, vector<int> right) { return (left[0] < right[0]); });
 
         vector<vector<int>> ret;
 
-        vector<int> merged_interval = min_pq.top();
-        min_pq.pop();
-        while (!min_pq.empty()) {
-            vector<int> cur_interval = min_pq.top();
-            min_pq.pop();
+        vector<int> merged_interval = intervals[0];
+        int i = 1;
+        while (i < intervals.size()) {
+            // vector<int> cur_interval = intervals[i];
 
-            if (cur_interval[0] <= merged_interval[1] && cur_interval[1] > merged_interval[1]) {
-                // If cur_interval overlaps with existing interval, and cur_interval ends after existing
-                merged_interval[1] = cur_interval[1];
-            } else if (cur_interval[0] <= merged_interval[1] && cur_interval[1] <= merged_interval[1]) {
-                // If existing interval completely encompasses cur_interval
+            if (intervals[i][0] <= merged_interval[1] && intervals[i][1] > merged_interval[1]) {
+                // If intervals[i] overlaps with existing interval, and intervals[i] ends after existing
+                merged_interval[1] = intervals[i][1];
+            } else if (intervals[i][0] <= merged_interval[1] && intervals[i][1] <= merged_interval[1]) {
+                // If existing interval completely encompasses intervals[i]
                 // do nothing
-            }
-            else {
+            } else {
                 // No overlap, push previous merged_interval into ret
                 ret.push_back(merged_interval);
-                merged_interval = cur_interval;
+                merged_interval = intervals[i];
             }
 
             // All cases have been covered. Only 3 cases as opposed to 6 because min_pq ensures intervals are sorted by start order
-
-            // if (min_pq.empty()) {
-            //     ret.push_back(merged_interval);
-            // }
+            ++i;
         }
 
         // Last one needs to be pushed
