@@ -13,7 +13,8 @@ class Solution {
         }
 
         // Custom lambda function to sort vectors based on size of first element
-        sort(intervals.begin(), intervals.end(), [](vector<int> left, vector<int> right) { return (left[0] < right[0]); });
+        // sort(intervals.begin(), intervals.end(), [](vector<int> left, vector<int> right) { return (left[0] < right[0]); });
+        sort(intervals.begin(), intervals.end());
 
         vector<vector<int>> ret;
 
