@@ -1,3 +1,6 @@
+// https://leetcode.com/problems/flatten-nested-list-iterator/discuss/80146/Real-iterator-in-Python-Java-C%2B%2B
+// STEFAN POCHMANN'S SOLUTION. ALL CREDITS GO TO HIM
+
 #include <iostream>
 #include <stack>
 #include <string>
@@ -22,65 +25,37 @@ class NestedInteger {
 };
 
 class NestedIterator {
-   public:
-    NestedIterator(vector<NestedInteger> &nestedList) : nested_list(&nestedList), cur_nested_int(&(nested_list->at(0))), bottom_level_size(nestedList.size()) {
-        frame_stack = {};
-        // Means the iterator is before index 0
-        frame_stack.emplace(-1, &nestedList);
-        stack_bottom_pointer = &frame_stack.top();
-        cout << "emplaced: -1, stack level: " << frame_stack.size() - 1 << endl;
+public:
+    NestedIterator(vector<NestedInteger> &nestedList) {
+        begins.push(nestedList.begin());
+        ends.push(nestedList.end());
     }
 
     int next() {
-        // We assume next() only gets called when hasNext() is true
-
-        // If we are on the last element of the current list, pop
-        if (frame_stack.top().first == frame_stack.top().second->size() - 1) {
-            cout << "popped: " << frame_stack.top().first << ", old stack level: " << frame_stack.size() - 1;
-            frame_stack.pop();
-            cout << ", new stack level: " << frame_stack.size() - 1 << endl;
-        }
-        ++frame_stack.top().first;
-        cout << "incremented: " << frame_stack.top().first << ", stack level: " << frame_stack.size() - 1 << endl;        
-
-        cur_nested_int = &(frame_stack.top().second->at(frame_stack.top().first));
-        if (cur_nested_int->isInteger()) {
-            cout << "cur_nested_int is: " << cur_nested_int->getInteger() << endl;
-        } else {
-            cout << "cur_nested_int is: an array with size "  << cur_nested_int->getList().size() <<endl;
-        }
-
-        while (!(cur_nested_int->isInteger())) {
-            std::vector<NestedInteger> *cur_nested_list = (std::vector<NestedInteger> *)&(cur_nested_int->getList());
-            frame_stack.emplace(0, cur_nested_list);
-            cout << "emplaced: " << frame_stack.top().first << ", stack level: " << frame_stack.size() - 1 << endl;
-            cur_nested_int = &(frame_stack.top().second->at(frame_stack.top().first));
-        }
-
-        cout << "returned: " << cur_nested_int->getInteger() << ", stack level: " << frame_stack.size() - 1 << endl;
-        return cur_nested_int->getInteger();
+        hasNext();
+        return (begins.top()++)->getInteger();
     }
 
     bool hasNext() {
-        // False if: stack is size 1 meaning we're at the bottom level, and the index is bottom_level_size - 1
-        if (stack_bottom_pointer->first == bottom_level_size - 1 && frame_stack.top().first == frame_stack.top().second->size() - 1) {
-            return false;
+        while (begins.size()) {
+            if (begins.top() == ends.top()) {
+                begins.pop();
+                ends.pop();
+            } else {
+                auto x = begins.top();
+                if (x->isInteger())
+                    return true;
+                begins.top()++;
+                begins.push(x->getList().begin());
+                ends.push(x->getList().end());
+            }
         }
-
-        // if (!nested_list->at(0).isInteger() && nested_list->at(0).getList().empty()) {
-        //     return false;
-        // }
-
-        // All other cases, has next. (really no edge-cases?)
-        return true;
+        return false;
     }
 
-   private:
-    stack<pair<int, vector<NestedInteger> *>> frame_stack;
-    pair<int, vector<NestedInteger> *>* stack_bottom_pointer;
-    int bottom_level_size;
-    vector<NestedInteger> *nested_list;
-    NestedInteger *cur_nested_int;
+private:
+    // Two stacks, each containing the beginning and end 
+    stack<vector<NestedInteger>::iterator> begins, ends;
 };
 
 /**
