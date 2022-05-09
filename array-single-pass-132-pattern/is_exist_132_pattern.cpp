@@ -11,17 +11,30 @@ class Solution {
             return false;
         }
 
-        bool monotonic_increase = nums[1] > nums[0];
+        // As soon as increase is detected, keep track of
+        // - beginning of increase
+        // - current maximum
+        // - first value which violates monotonic increase. Check this value for 132 condition
 
+        bool increasing = nums[1] > nums[0];
+        int local_min = nums[0];
+        int local_max = nums[1];
         for (int i = 2; i < nums.size(); ++i) {
-            // return true as soon as monotonic increasing or monotonic decreasing is violated
-            if (monotonic_increase) {
-                if (nums[i] < nums[i - 1]) {
+            if (increasing) {
+                if (nums[i] > local_min && nums[i] < local_max) {
                     return true;
+                } else if (nums[i] < local_min && nums[i] < local_max) {
+                    increasing = false;
+                    local_min = nums[i];
                 }
+                // else increasing remains true (untouched)
             } else {
+                // if not already increasing, the we can't return anything. 
+                // Most we can do is to change the increasing boolean to true, and to change the local_min or max variables
                 if (nums[i] > nums[i - 1]) {
-                    return true;
+                    increasing = true;
+                    local_min = nums[i - 1];
+                    local_max = nums[i];
                 }
             }
         }
@@ -34,6 +47,10 @@ int main() {
     Solution solution;
     vector<int> input;
 
+    // true
+    input = {3, 1, 4, 2};
+    cout << (solution.find132pattern(input) ? "true" : "false") << endl;
+
     // false (this testcase defeats monotonic increase/decrease approach)
     input = {3, 6, 3};
     cout << (solution.find132pattern(input) ? "true" : "false") << endl;
@@ -44,10 +61,6 @@ int main() {
 
     // false
     input = {1, 2, 3, 4};
-    cout << (solution.find132pattern(input) ? "true" : "false") << endl;
-
-    // true
-    input = {3, 1, 4, 2};
     cout << (solution.find132pattern(input) ? "true" : "false") << endl;
 
     // true
