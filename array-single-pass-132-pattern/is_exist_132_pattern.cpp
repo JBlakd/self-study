@@ -7,22 +7,22 @@ using namespace std;
 class Solution {
    public:
     bool find132pattern(vector<int>& nums) {
-        int max = -1000000001;
-        int max_idx = -1;
-        int min = 1000000001;
-        int min_idx = -1;
-        for (int i = 0; i < nums.size(); ++i) {
-            if (nums[i] > max) {
-                max = nums[i];
-                max_idx = i;
-            }
-            if (nums[i] < min) {
-                min = nums[i];
-                min_idx = i;
-            }
+        if (nums.size() < 3) {
+            return false;
+        }
 
-            if (nums[i] < max && nums[i] > min && max_idx < i && max_idx > min_idx) {
-                return true;
+        bool monotonic_increase = nums[1] > nums[0];
+
+        for (int i = 2; i < nums.size(); ++i) {
+            // return true as soon as monotonic increasing or monotonic decreasing is violated
+            if (monotonic_increase) {
+                if (nums[i] < nums[i - 1]) {
+                    return true;
+                }
+            } else {
+                if (nums[i] > nums[i - 1]) {
+                    return true;
+                }
             }
         }
 
@@ -34,7 +34,15 @@ int main() {
     Solution solution;
     vector<int> input;
 
-        // false
+    // false (this testcase defeats monotonic increase/decrease approach)
+    input = {3, 6, 3};
+    cout << (solution.find132pattern(input) ? "true" : "false") << endl;
+
+    // true
+    input = {3, 5, 0, 3, 4};
+    cout << (solution.find132pattern(input) ? "true" : "false") << endl;
+
+    // false
     input = {1, 2, 3, 4};
     cout << (solution.find132pattern(input) ? "true" : "false") << endl;
 
