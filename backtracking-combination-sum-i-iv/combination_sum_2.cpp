@@ -13,6 +13,7 @@ class Solution {
         sort(candidates.begin(), candidates.end());
         vector<int> cur_vec = {};
         int cur_sum = 0;
+        // FAIL
         unordered_set<vector<int>> ret_set;
 
         // Start at all indices
@@ -50,15 +51,6 @@ class Solution {
             cur_vec.pop_back();
             // cout << endl;
             return;
-        } else {
-            // haven't reached sum yet. Try all subsequent indices
-            // + 1 so we don't look into the same number. Key difference from Combination Sum I
-            for (int i = cur_index + 1; i < candidates.size(); ++i) {
-                dfs(cur_vec, cur_sum, ret_set, candidates, i, target);
-            }
-            // tried all options. time to backtrack
-            cur_sum -= candidates[cur_index];
-            cur_vec.pop_back();
         }
     }
 

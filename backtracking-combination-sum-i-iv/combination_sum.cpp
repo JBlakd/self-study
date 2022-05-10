@@ -11,40 +11,33 @@ class Solution {
         int cur_sum = 0;
         vector<vector<int>> ret = {};
         // Start at all indices
-        for (int cur_index = 0; cur_index < candidates.size(); ++cur_index) {
-            dfs(cur_vec, cur_sum, ret, candidates, cur_index, target);
-        }
+        dfs(cur_vec, cur_sum, ret, candidates, 0, target);
         return ret;
     }
 
    private:
     void dfs(vector<int>& cur_vec, int& cur_sum, vector<vector<int>>& ret, vector<int>& candidates, int cur_index, int target) {
-        cur_vec.push_back(candidates[cur_index]);
-        cur_sum += candidates[cur_index];
-
-        // cout << "Exploring ";
-        // print_vector(cur_vec);
-        // cout << " Sum: " << cur_sum << " ";
-
-        if (cur_sum >= target) {
-            if (cur_sum == target) {
-                // cout << " (worked)";
-                ret.push_back(cur_vec);
-            }
-
-            // backtrack
-            cur_sum -= candidates[cur_index];
-            cur_vec.pop_back();
-            // cout << endl;
+        // found!
+        if (cur_sum == target) {
+            ret.push_back(cur_vec);
             return;
-        } else {
-            // haven't reached sum yet. Try all subsequent indices
-            for (int i = cur_index; i < candidates.size(); ++i) {
-                dfs(cur_vec, cur_sum, ret, candidates, i, target);
-            }
-            // tried all options. time to backtrack
+        }
+
+        // don't continue if sum exceeds target
+        if (cur_sum > target) {
+            return;
+        }
+
+        // At this point, can continue to explore all indices
+        while (cur_index < candidates.size()) {
+            cur_vec.push_back(candidates[cur_index]);
+            cur_sum += candidates[cur_index];
+            dfs(cur_vec, cur_sum, ret, candidates, cur_index, target);
+
+            // after return, backtrack
             cur_sum -= candidates[cur_index];
             cur_vec.pop_back();
+            ++cur_index;
         }
     }
 
@@ -79,6 +72,15 @@ int main() {
     int target;
     vector<vector<int>> output;
 
+    candidates = {2, 3, 5};
+    target = 8;
+    output = solution.combinationSum(candidates, target);
+    for (auto vec : output) {
+        print_vector(vec);
+        cout << ", ";
+    }
+    cout << endl;
+
     candidates = {2};
     target = 1;
     output = solution.combinationSum(candidates, target);
@@ -90,15 +92,6 @@ int main() {
 
     candidates = {2, 3, 6, 7};
     target = 7;
-    output = solution.combinationSum(candidates, target);
-    for (auto vec : output) {
-        print_vector(vec);
-        cout << ", ";
-    }
-    cout << endl;
-
-    candidates = {2, 3, 5};
-    target = 8;
     output = solution.combinationSum(candidates, target);
     for (auto vec : output) {
         print_vector(vec);
