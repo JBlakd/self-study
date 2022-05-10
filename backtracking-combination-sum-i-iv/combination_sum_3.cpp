@@ -15,9 +15,9 @@ class Solution {
 
    private:
     void dfs(vector<vector<int>>& ret, vector<int>& cur_vec, int cur_num, int k, int n) {
-        cout << "Exploring: ";
-        print_vector(cur_vec);
-        cout << " n: " << n << endl;
+        // cout << "Exploring: ";
+        // print_vector(cur_vec);
+        // cout << " n: " << n << endl;
 
         // fail base case: no more sum or gone too deep
         if (n < 0 || cur_vec.size() > k) {
@@ -43,17 +43,17 @@ class Solution {
         }
     }
 
-    template <typename T>
-    void print_vector(vector<T> vec) {
-        cout << "{";
-        for (int i = 0; i < vec.size(); i++) {
-            cout << vec[i];
-            if (i != vec.size() - 1) {
-                cout << ", ";
-            }
-        }
-        cout << "}";
-    }
+    // template <typename T>
+    // void print_vector(vector<T> vec) {
+    //     cout << "{";
+    //     for (int i = 0; i < vec.size(); i++) {
+    //         cout << vec[i];
+    //         if (i != vec.size() - 1) {
+    //             cout << ", ";
+    //         }
+    //     }
+    //     cout << "}";
+    // }
 };
 
 template <typename T>
