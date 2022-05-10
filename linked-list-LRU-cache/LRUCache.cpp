@@ -1,148 +1,66 @@
 #include <iostream>
+#include <list>
 #include <string>
 #include <unordered_map>
 #include <vector>
 
 using namespace std;
 
+// Don't fucking implement your own doubly-linked list ya dumb kunt
 class LRUCache {
    public:
-    LRUCache(int capacity) : capacity(capacity), head(nullptr), tail(nullptr) {
-        // If I just have a linked list without a hashmap, then I couldn't get the nodes in the middle of the list in O(1)
-        // If I don't have a linked list, then I couldn't really keep track of the age order of the nodes
-        // Need a doubly-linked list in order to transplant middle nodes (re-linking prev and next) to the head
-        hashmap.clear();
+    LRUCache(int capacity) : capacity(capacity) {
     }
 
-    // Return -1 if not found
     int get(int key) {
-        if (hashmap.find(key) == hashmap.end()) {
-            return -1;
+        // Move to front if key exists
+        if (hashmap.find(key) != hashmap.end()) {
+            auto found_node(hashmap.at(key));
+            // Move to front
+            linked_list.splice(linked_list.begin(), linked_list, found_node);
+            return found_node->second;
         }
 
-        // re-link everything
-        ListNode* found_node = hashmap.at(key);
-        if (found_node == head) {
-            return found_node->val;
-        }
-
-        if (found_node == tail) {
-            tail = found_node->next;
-            tail->prev = nullptr;
-            // Special case for if the new tail is the head
-            // In this case, new tail needs to have a next
-            if (tail == head) {
-                tail->next = found_node;
-            }
-            found_node->next = nullptr;
-            found_node->prev = head;
-            head = found_node;
-            return found_node->val;
-        }
-
-        // Now we are sure that found_node is a middle node
-        found_node->prev->next = found_node->next;
-        found_node->next->prev = found_node->prev;
-
-        // reassign node as head
-        found_node->next = nullptr;
-        found_node->prev = head;
-        head = found_node;
-        return found_node->val;
+        return -1;
     }
 
     void put(int key, int value) {
-        if (capacity == 1) {
-            if (hashmap.size() == 1) {
-                hashmap.erase(head->key);
-                delete head;
-            }
-            head = new ListNode(key, value);
-            tail = head;
-            hashmap.emplace(key, head);
-            return;
-        }
-
-        // if key already exists, then update
+        // Update if key exists
         if (hashmap.find(key) != hashmap.end()) {
-            ListNode* found_node = hashmap.at(key);
-            found_node->val = value;
-            if (found_node == head) {
-                return;
-            }
-
-            if (found_node == tail) {
-                tail = found_node->next;
-                tail->prev = nullptr;
-                // Special case for if the new tail is the head
-                // In this case, new tail needs to have a next
-                if (tail == head) {
-                    tail->next = found_node;
-                }
-                found_node->next = nullptr;
-                found_node->prev = head;
-                head = found_node;
-                return;
-            }
-
-            // Now we are sure that found_node is a middle node
-            found_node->prev->next = found_node->next;
-            found_node->next->prev = found_node->prev;
-
-            // reassign node as head
-            found_node->next = nullptr;
-            found_node->prev = head;
-            head = found_node;
-
+            auto found_node(hashmap.at(key));
+            // Update
+            found_node->second = value;
+            // Move to front
+            linked_list.splice(linked_list.begin(), linked_list, found_node);
             return;
         }
 
-        if (hashmap.size() >= capacity) {
-            // delete the tail, re-assign tail
-            ListNode* old_tail = tail;
-            tail = old_tail->next;
-            tail->prev = nullptr;
-            hashmap.erase(old_tail->key);
-            delete old_tail;
-        }
+        // Key doesn't exist, capacity not yet reached
+        if (hashmap.size() < capacity) {
+            // Add new node to front
+            linked_list.emplace_front(key, value);
+            // Add hashmap entry
+            hashmap.emplace(key, linked_list.begin());
+        } else {
+            // Capacity reached
+            // Remove tail
+            auto old_tail_key = linked_list.back().first;
+            linked_list.pop_back();
+            hashmap.erase(old_tail_key);
 
-        // create a new node and assign it to the head
-        ListNode* new_head = new ListNode(key, value);
-        if (hashmap.size() > 0) {
-            new_head->prev = head;
-            head->next = new_head;
+            // Add new node to front
+            linked_list.emplace_front(key, value);
+            // Add hashmap entry
+            hashmap.emplace(key, linked_list.begin());
         }
-        if (hashmap.size() == 0) {
-            tail = new_head;
-        }
-        head = new_head;
-        hashmap.emplace(key, head);
     }
 
    private:
-    // head of list denotes most recently used. Useful for assigning to most recently get() or put() elements
-    // tail of list denotes least recently used. Useful for getting the next element for deletion in O(1) time.
-    struct ListNode {
-        int key;
-        int val;
-        ListNode* next;
-        ListNode* prev;
-        ListNode(int x, int y) : key(x), val(y), next(nullptr), prev(nullptr) {}
-    };
-
+    //            key, pointer (iterator) to node
+    unordered_map<int, list<pair<int, int>>::iterator> hashmap;
+    //   node key, val
+    list<pair<int, int>> linked_list;
     int capacity;
-    unordered_map<int, ListNode*> hashmap;
-    ListNode* head;
-    ListNode* tail;
-
-    // ~LRUCache() {
-    //     ListNode* cur_node = tail;
-    //     while (cur_node != nullptr) {
-    //         ListNode* next_node = cur_node->next;
-    //         delete cur_node;
-    //         cur_node = next_node;
-    //     }
-    // }
 };
 
 int main() {
