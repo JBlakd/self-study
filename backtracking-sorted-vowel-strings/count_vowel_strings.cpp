@@ -7,32 +7,18 @@ using namespace std;
 class Solution {
    public:
     int countVowelStrings(int n) {
-        char vowels[] = "aeiou";
-        string cur_string = "";
-        int ret = 0;
-        dfs(vowels, 0, cur_string, ret, n);
-        return ret;
-    }
+        // Intuitive one-liner permutation solution
 
-   private:
-    void dfs(const char* vowels, int cur_vowel_idx, string& cur_string, int& ret, const int& n) {
-        // cout << "Exploring: " << cur_string;
+        // We are simply working with a base 5 counting system.
+        // Think hexadecimal, but base 5 instead of 16. This decimal, but base 5 instead of 10.
+        // In this counting system, how many numbers contain n digits?
 
-        // success base case
-        if (cur_string.length() == n) {
-            ++ret;
-            // cout << " (found!)" << endl;
-            return;
-        }
-
-        // cout << endl;
-
-        for (int i = cur_vowel_idx; i < 5; ++i) {
-            cur_string.append(1, vowels[i]);
-            dfs(vowels, i, cur_string, ret, n);
-            // backtrack
-            cur_string.pop_back();
-        }
+        // Let's try to answer that question for the base 10 counting system:
+        // How many 3 digit numbers in our base 10 counting system?
+        // The smallest 3 digit base 10 number is 10^2 = 10^(n-1) = 100
+        // The largest 3 digit base 10 number is 10^3 - 1 = 1000 - 1 = 999
+        // The inclusive size of this range is 999 - 100 + 1
+        // The formula is base^(n-1) - ( base^n - 1 ) + 1 = base^(n-1) - base^n + 2
     }
 };
 
