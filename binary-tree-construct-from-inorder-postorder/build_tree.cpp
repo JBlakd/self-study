@@ -33,17 +33,26 @@ class Solution {
         // cur_node's value is the value of postorder at post_end,
         TreeNode *cur_node = new TreeNode(*post_end);
         // Left inorder starts at the beginning of inorder, and ends at the element left of the cur_node's value
-        vector<int>::iterator &left_inorder_begin = inorder.begin();
-        vector<int>::iterator &left_inorder_end = find(inorder.begin(), inorder.end(), *post_end) - 1;
+        vector<int>::iterator left_inorder_begin = inorder.begin();
+        vector<int>::iterator left_inorder_end = find(inorder.begin(), inorder.end(), *post_end) - 1;
         int left_num_elements = distance(left_inorder_begin, left_inorder_end) + 1;
         // Left postorder starts at the beginning of postorder, and goes on for the same length as left inorder
         cur_node->left = dfs(left_inorder_begin, left_inorder_end, inorder, postorder.begin(), postorder.begin() + left_num_elements - 1, postorder);
         // Right inorder starts at the element after cur_node's value, and ends at the end of inorder
-        // Right postorder starts at postorder.begin() + left_num_elements, and ends at the element before post_end
+        // Right postorder starts at postorder.begin() + left_num_elements - 1, and ends at the element before post_end
+        cur_node->right = dfs(left_inorder_begin + 2, inorder.end() - 1, inorder, postorder.begin() + left_num_elements - 1, post_end - 1, postorder);
         return cur_node;
     }
 };
 
 int main() {
     Solution solution;
+    vector<int> inorder;
+    vector<int> postorder;
+    TreeNode *output;
+
+    inorder = {9, 3, 15, 20, 7};
+    postorder = {9, 15, 7, 20, 3};
+    output = solution.buildTree(inorder, postorder);
+    cout << output->val << endl;
 }
