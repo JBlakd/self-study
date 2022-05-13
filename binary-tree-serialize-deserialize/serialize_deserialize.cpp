@@ -21,6 +21,9 @@ class Codec {
         }
 
         // find right-most node to see how many characters the string needs
+        // can't use this approach to determine array size.
+        // Use a recursive method
+        // MATE DON'T EVEN USE AN ARRAY, USE A HASHMAP
         TreeNode* cur_node = root;
         int count = 1;
         while (cur_node->right != nullptr) {
