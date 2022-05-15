@@ -12,62 +12,50 @@ class Solution {
             return a[0] < b[0];
         });
 
-        vector<bool> tile_vec(tiles.back().back(), false);
-        for (auto &tile_block : tiles) {
-            for (int i = tile_block[0] - 1; i <= tile_block[1] - 1; ++i) {
-                tile_vec[i] = true;
-            }
-        }
+        int max_tiles_covered = 0;
 
-        // sliding window
-        int window_start = 0;
-        int window_end = carpetLen - 1;
-        // initialise sliding window
-        int most_tiles_found = 0;
-        for (int i = 0; i <= window_end; ++i) {
-            if (tile_vec[i]) {
-                ++most_tiles_found;
-            }
-        }
-
-        // CAREFUL, THE TILES ARE ONE-INDEXED
-
-        // slide the window
-        int cur_tiles_in_window = most_tiles_found;
-        while (window_end <= tiles.back().back() - 1) {
-            ++window_start;
-            ++window_end;
-
-            // logic for updating cur_tiles_in_window
-            // snake eating
-            if (tile_vec[window_end]) {
-                ++cur_tiles_in_window;
-            }
-            // snake shitting
-            if (tile_vec[window_start - 1]) {
-                --cur_tiles_in_window;
-            }
-
-            // brute force:
-            // for (int i = window_start; i <= window_end; ++i) {
-            //     if (tile_vec[i]) {
-            //         ++cur_tiles_in_window;
-            //     }
-            // }
-
-            // cout << "window_start: " << window_start << " window_end: " << window_end << " tiles: " << cur_tiles_in_window << endl;
-
-            if (cur_tiles_in_window > most_tiles_found) {
-                most_tiles_found = cur_tiles_in_window;
-            }
-
-            // Another case to save time
-            if (cur_tiles_in_window == carpetLen) {
+        // Now we have a sorted array of tile intervals
+        // Try to overlay the carpet at the start of every interval
+        for (int i = 0; i < tiles.size(); ++i) {
+            // return carpet length if tile interval longer than the carpet is encountered
+            if (tiles[i][1] - tiles[i][0] + 1 > carpetLen) {
                 return carpetLen;
             }
+
+            // find the last tile interval that this carpet is involved in
+            // this tile interval may or may be fully encompassed by the carpet
+            int carpet_end = tiles[i][0] + carpetLen - 1;
+            int end_tile_interval_index = i;
+            for (int j = i; j < tiles.size(); ++j) {
+                if (tiles[j][0] <= carpet_end) {
+                    end_tile_interval_index = j;
+                } else {
+                    break;
+                }
+            }
+
+            // sum up the tiles of all the tile intervals that the carpet is involved in
+            int cur_tiles_covered = 0;
+            for (int j = i; j <= end_tile_interval_index; j++) {
+                if (j == end_tile_interval_index) {
+                    // if the end tile interval is not fully encompassed by the carpet
+                    if (tiles[j][1] > carpet_end) {
+                        cur_tiles_covered += (carpet_end - tiles[j][0] + 1);
+                    } else {
+                        // Otherwise, just like normal.
+                        cur_tiles_covered += (tiles[j][1] - tiles[j][0] + 1);
+                    }
+                } else {
+                    cur_tiles_covered += (tiles[j][1] - tiles[j][0] + 1);
+                }
+            }
+
+            if (cur_tiles_covered > max_tiles_covered) {
+                max_tiles_covered = cur_tiles_covered;
+            }
         }
 
-        return most_tiles_found;
+        return max_tiles_covered;
     }
 };
 
@@ -88,7 +76,7 @@ int main() {
     vector<vector<int>> tiles;
     int carpetLen;
 
-    // ?
+    // 1281 ?
     tiles = {{8051, 8057}, {8074, 8089}, {7994, 7995}, {7969, 7987}, {8013, 8020}, {8123, 8139}, {7930, 7950}, {8096, 8104}, {7917, 7925}, {8027, 8035}, {8003, 8011}};
     carpetLen = 9854;
     cout << solution.maximumWhiteTiles(tiles, carpetLen) << endl;
