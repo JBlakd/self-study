@@ -1,4 +1,5 @@
 #include <iostream>
+#include <queue>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -21,24 +22,18 @@ class Codec {
             return "";
         }
 
-        // Have a hashmap to hold the serialized result. Turn it into a comma-separated string later.
-        // Key is the one-index, val is the TreeNode*
-        unordered_map<unsigned long long, TreeNode*> hashmap;
-
-        // Recursively populate hashmap
-        unsigned long long max_one_index = 0;
-        dfs_serial(root, 1, hashmap, max_one_index);
-
-        // Turn hashmap into a comma-separated string
+        // "preorder|inorder"
         string ret;
-        for (auto& entry : hashmap) {
-            ret.append(to_string(entry.first));
-            ret.append(":");
-            ret.append(to_string(entry.second->val));
-            ret.append(",");
-        }
-        // Pop the last comma
+        dfs_preorder(root, ret);
+        // pop the final comma
         ret.pop_back();
+        ret.append("|");
+        dfs_inorder(root, ret);
+        // pop the final comma
+        ret.pop_back();
+
+        // cout << ret << endl;
+
         return ret;
     }
 
@@ -48,55 +43,114 @@ class Codec {
             return nullptr;
         }
 
-        stringstream ss(data);
-        unordered_map<unsigned long long, TreeNode*> hashmap;
+        vector<int> preorder;
+        vector<int> inorder;
+        string substr;
+        bool populating_preorder = true;
 
-        // Parse string into hashmap
-        while (ss.good()) {
-            string substr;
-            getline(ss, substr, ',');
-            string key = substr.substr(0, substr.find(':'));
-            string val = substr.substr(substr.find(':') + 1);
-            TreeNode* node = new TreeNode(stoi(val, nullptr, 10));
-            hashmap.emplace(stoull(key, nullptr, 10), node);
+        // parse into arrays
+        for (int i = 0; i < data.length(); ++i) {
+            switch (data[i]) {
+                case ',':
+                    if (populating_preorder) {
+                        preorder.push_back(stoi(substr, nullptr, 10));
+                    } else {
+                        inorder.push_back(stoi(substr, nullptr, 10));
+                    }
+                    substr.clear();
+                    break;
+                case '|':
+                    preorder.push_back(stoi(substr, nullptr, 10));
+                    substr.clear();
+                    populating_preorder = false;
+                    break;
+                default:
+                    substr.append(1, data[i]);
+            }
         }
+        // Parse the final substring because it is not followed by any delimiter
+        inorder.push_back(stoi(substr, nullptr, 10));
 
-        // Recursively link the nodes in hashmap
-        dfs_deserial(hashmap, 1);
+        // populate inorder data into a map for constant time searching
+        // unordered_map<int, queue<int>> inorder_map;
+        // for (int i = 0; i < inorder.size(); ++i) {
+        //     if (inorder_map.find(inorder[i]) == inorder_map.end()) {
+        //         queue<int> temp;
+        //         temp.push(i);
+        //         inorder_map.emplace(inorder[i], temp);
+        //     } else {
+        //         inorder_map.at(inorder[i]).push(i);
+        //     }
+        // }
 
-        return hashmap[1];
+        TreeNode* root = dfs_deser(0, preorder.size() - 1, preorder, 0, inorder.size() - 1, inorder);
+        return root;
     }
 
    private:
-    void dfs_serial(TreeNode* cur_node, unsigned long long one_index, unordered_map<unsigned long long, TreeNode*>& hashmap, unsigned long long& max_one_index) {
-        hashmap.emplace(one_index, cur_node);
-        if (one_index > max_one_index) {
-            max_one_index = one_index;
-        }
+    void dfs_preorder(TreeNode* cur_node, string& ret) {
+        ret.append(to_string(cur_node->val));
+        ret.append(",");
         if (cur_node->left != nullptr) {
-            dfs_serial(cur_node->left, 2 * one_index, hashmap, max_one_index);
+            dfs_preorder(cur_node->left, ret);
         }
         if (cur_node->right != nullptr) {
-            dfs_serial(cur_node->right, 2 * one_index + 1, hashmap, max_one_index);
+            dfs_preorder(cur_node->right, ret);
         }
     }
 
-    void dfs_deserial(unordered_map<unsigned long long, TreeNode*>& hashmap, unsigned long long cur_node_one_index) {
-        // if left child exists
-        if (hashmap.find(2 * cur_node_one_index) != hashmap.end()) {
-            // connect cur_node to left child
-            hashmap[cur_node_one_index]->left = hashmap[2 * cur_node_one_index];
-            // visit left child
-            dfs_deserial(hashmap, 2 * cur_node_one_index);
+    void dfs_inorder(TreeNode* cur_node, string& ret) {
+        if (cur_node->left != nullptr) {
+            dfs_inorder(cur_node->left, ret);
+        }
+        ret.append(to_string(cur_node->val));
+        ret.append(",");
+        if (cur_node->right != nullptr) {
+            dfs_inorder(cur_node->right, ret);
+        }
+    }
+
+    TreeNode* dfs_deser(int pre_start, int pre_end, vector<int>& preorder, int in_start, int in_end, vector<int>& inorder) {
+        TreeNode* cur_node = new TreeNode(preorder[pre_start]);
+
+        // Base case: leaf reached
+        if (pre_start == pre_end) {
+            return cur_node;
         }
 
-        // if right child exists
-        if (hashmap.find(2 * cur_node_one_index + 1) != hashmap.end()) {
-            // connect cur_node to right child
-            hashmap[cur_node_one_index]->right = hashmap[2 * cur_node_one_index + 1];
-            // visit left child
-            dfs_deserial(hashmap, 2 * cur_node_one_index + 1);
+        // Find index of cur_node value within inorder array
+        // int in_cur_idx = inorder_map[preorder[pre_start]].front();
+        // inorder_map[preorder[pre_start]].pop();
+
+        int in_cur_idx;
+        for (int i = in_start; i <= in_end; ++i) {
+            if (inorder[i] == preorder[pre_start]) {
+                in_cur_idx = i;
+                break;
+            }
         }
+
+        // left next inorder: [in_start, in_cur_idx - 1]
+        // num_left_elements = in_cur_idx - in_start
+        // num_right_elements = in_end - in_cur_index
+        // right next inorder: [in_cur_idx + 1, in_end]
+        // left next preorder: [pre_start + 1, pre_start + num_left_elements]
+        // right next preorder: [pre_end - num_right_elements + 1 , pre_end]
+
+        int num_left_elements = in_cur_idx - in_start;
+        int num_right_elements = in_end - in_cur_idx;
+
+        // dfs left if left child exists
+        if (in_cur_idx != in_start) {
+            cur_node->left = dfs_deser(pre_start + 1, pre_start + num_left_elements, preorder, in_start, in_cur_idx - 1, inorder);
+        }
+
+        // dfs right if right child exists
+        if (in_cur_idx != in_end) {
+            cur_node->right = dfs_deser(pre_end - num_right_elements + 1, pre_end, preorder, in_cur_idx + 1, in_end, inorder);
+        }
+
+        return cur_node;
     }
 };
 
@@ -106,7 +160,25 @@ int main() {
     string serialized;
     TreeNode* deserialized;
 
-    input = "1:1,2:2,3:3,6:4,7:5,12:6,13:7";
+    input = "6,0,-1,6,-4|0,-1,6,-4,6";
+    deserialized = solution.deserialize(input);
+    serialized = solution.serialize(deserialized);
+    if (serialized.compare(input) == 0) {
+        cout << "Serialize success: " << input << endl;
+    } else {
+        cout << "Serialize fail. Got: " << serialized << " Expected: " << input << endl;
+    }
+
+    input = "4,-7,-3,-9,9,6,0,-1,6,-4,-7,-6,5,-6,9,-2,-3,-4|-7,4,0,-1,6,-4,6,9,-9,5,-6,-7,-2,9,-6,-3,-4,-3";
+    deserialized = solution.deserialize(input);
+    serialized = solution.serialize(deserialized);
+    if (serialized.compare(input) == 0) {
+        cout << "Serialize success: " << input << endl;
+    } else {
+        cout << "Serialize fail. Got: " << serialized << " Expected: " << input << endl;
+    }
+
+    input = "6,9,7,2,1,4,2|9,2,7,1,6,2,4";
     deserialized = solution.deserialize(input);
     serialized = solution.serialize(deserialized);
     if (serialized.compare(input) == 0) {
@@ -149,7 +221,7 @@ int main() {
         cout << "Serialize fail. Got: " << serialized << ". Expected: " << input << endl;
     }
 
-    input = "1:69";
+    input = "1|1";
     deserialized = solution.deserialize(input);
     serialized = solution.serialize(deserialized);
     if (serialized.compare(input) == 0) {
@@ -158,12 +230,12 @@ int main() {
         cout << "Serialize fail. Got: " << serialized << ". Expected: " << input << endl;
     }
 
-    input = "1:1,2:2,3:3,4:4,7:7,9:9,14:14";
-    deserialized = solution.deserialize(input);
-    serialized = solution.serialize(deserialized);
-    if (serialized.compare(input) == 0) {
-        cout << "Serialize success: " << input << endl;
-    } else {
-        cout << "Serialize fail. Got: " << serialized << ". Expected: " << input << endl;
-    }
+    // input = "1:1,2:2,3:3,4:4,7:7,9:9,14:14";
+    // deserialized = solution.deserialize(input);
+    // serialized = solution.serialize(deserialized);
+    // if (serialized.compare(input) == 0) {
+    //     cout << "Serialize success: " << input << endl;
+    // } else {
+    //     cout << "Serialize fail. Got: " << serialized << ". Expected: " << input << endl;
+    // }
 }
