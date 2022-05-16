@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 using namespace std;
@@ -17,12 +18,18 @@ struct TreeNode {
 class Solution {
    public:
     TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
-        TreeNode* root = dfs(0, preorder.size() - 1, preorder, 0, inorder.size() - 1, inorder);
+        // populate inorder data into a map for constant time searching
+        unordered_map<int, int> inorder_map;
+        for (int i = 0; i < inorder.size(); ++i) {
+            inorder_map.emplace(inorder[i], i);
+        }
+
+        TreeNode* root = dfs(0, preorder.size() - 1, preorder, 0, inorder.size() - 1, inorder, inorder_map);
         return root;
     }
 
    private:
-    TreeNode* dfs(int pre_start, int pre_end, vector<int>& preorder, int in_start, int in_end, vector<int>& inorder) {
+    TreeNode* dfs(int pre_start, int pre_end, vector<int>& preorder, int in_start, int in_end, vector<int>& inorder, unordered_map<int, int>& inorder_map) {
         TreeNode* cur_node = new TreeNode(preorder[pre_start]);
 
         // Base case: leaf reached
@@ -31,12 +38,12 @@ class Solution {
         }
 
         // Find index of cur_node value within inorder array
-        int in_cur_idx;
-        for (int i = in_start; i <= in_end; ++i) {
-            if (inorder[i] == preorder[pre_start]) {
-                in_cur_idx = i;
-            }
-        }
+        int in_cur_idx = inorder_map[preorder[pre_start]];
+        // for (int i = in_start; i <= in_end; ++i) {
+        //     if (inorder[i] == preorder[pre_start]) {
+        //         in_cur_idx = i;
+        //     }
+        // }
 
         // left next inorder: [in_start, in_cur_idx - 1]
         // num_left_elements = in_cur_idx - in_start
@@ -50,12 +57,12 @@ class Solution {
 
         // dfs left if left child exists
         if (in_cur_idx != in_start) {
-            cur_node->left = dfs(pre_start + 1, pre_start + num_left_elements, preorder, in_start, in_cur_idx - 1, inorder);
+            cur_node->left = dfs(pre_start + 1, pre_start + num_left_elements, preorder, in_start, in_cur_idx - 1, inorder, inorder_map);
         }
 
         // dfs right if right child exists
         if (in_cur_idx != in_end) {
-            cur_node->right = dfs(pre_end - num_right_elements + 1, pre_end, preorder, in_cur_idx + 1, in_end, inorder);
+            cur_node->right = dfs(pre_end - num_right_elements + 1, pre_end, preorder, in_cur_idx + 1, in_end, inorder, inorder_map);
         }
 
         return cur_node;
