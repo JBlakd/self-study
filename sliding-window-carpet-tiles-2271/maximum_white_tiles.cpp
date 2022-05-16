@@ -5,6 +5,8 @@
 
 using namespace std;
 
+// TODO: O(nlogn) solution. n to lay carpet at the beginning of every interval. n to calculate prefix sum. logn to binary search end interval
+
 class Solution {
    public:
     int maximumWhiteTiles(vector<vector<int>> &tiles, int carpetLen) {
