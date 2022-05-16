@@ -65,19 +65,26 @@ class Codec {
                 if (node_stack.top().second == 'l') {
                     node_stack.top().second = 'r';
                 } else if (node_stack.top().second == 'r') {
-                    node_stack.pop();
-                    node_stack.top().second = 'r';
+                    node_stack.top().second = 'd';
+                } else if (node_stack.top().second == 'd') {
+                    while (node_stack.top().second == 'd') {
+                        node_stack.pop();
+                    }
                 }
             } else {
                 if (node_stack.top().second == 'l') {
-                    node_stack.top().first->left = new TreeNode(preorder[i]);
+                    node_stack.top().first = new TreeNode(preorder[i]);
                     node_stack.top().second = 'r';
-                    node_stack.emplace(node_stack.top().first->left, 'l');
+                    node_stack.emplace(node_stack.top().first, 'l');
                 } else if (node_stack.top().second == 'r') {
-                    TreeNode* temp = new TreeNode(preorder[i]);
-                    node_stack.top().first->right = temp;
-                    node_stack.pop();
-                    node_stack.emplace(temp, 'l');
+                    node_stack.top().first = new TreeNode(preorder[i]);
+                    node_stack.top().second = 'd';
+                    node_stack.emplace(node_stack.top().first, 'l');
+                } else if (node_stack.top().second == 'd') {
+                    while (node_stack.top().second == 'd') {
+                        node_stack.pop();
+                    }
+                    // TODO
                 }
             }
         }
