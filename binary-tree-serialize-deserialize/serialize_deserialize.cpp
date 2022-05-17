@@ -1,7 +1,6 @@
 #include <iostream>
 #include <queue>
 #include <sstream>
-#include <stack>
 #include <string>
 #include <vector>
 
@@ -55,39 +54,9 @@ class Codec {
             }
         }
 
-        // TODO: actually needs 3 states: left, right, done
-        stack<pair<TreeNode*, char>> node_stack;
-        TreeNode* root = new TreeNode(preorder[0]);
-        node_stack.emplace(root, 'l');
-        // stack-based parsing
-        for (int i = 1; i < preorder.size(); ++i) {
-            if (preorder[i] == 1001) {
-                if (node_stack.top().second == 'l') {
-                    node_stack.top().second = 'r';
-                } else if (node_stack.top().second == 'r') {
-                    node_stack.top().second = 'd';
-                } else if (node_stack.top().second == 'd') {
-                    while (node_stack.top().second == 'd') {
-                        node_stack.pop();
-                    }
-                }
-            } else {
-                if (node_stack.top().second == 'l') {
-                    node_stack.top().first = new TreeNode(preorder[i]);
-                    node_stack.top().second = 'r';
-                    node_stack.emplace(node_stack.top().first, 'l');
-                } else if (node_stack.top().second == 'r') {
-                    node_stack.top().first = new TreeNode(preorder[i]);
-                    node_stack.top().second = 'd';
-                    node_stack.emplace(node_stack.top().first, 'l');
-                } else if (node_stack.top().second == 'd') {
-                    while (node_stack.top().second == 'd') {
-                        node_stack.pop();
-                    }
-                    // TODO
-                }
-            }
-        }
+        // Recursive parsing
+        int index = 0;
+        TreeNode* root = dfs_deser(preorder, index);
 
         return root;
     }
@@ -103,6 +72,27 @@ class Codec {
         ret.append(",");
         dfs(cur_node->left, ret);
         dfs(cur_node->right, ret);
+    }
+
+    TreeNode* dfs_deser(vector<int>& preorder, int& index) {
+        // Base case
+        if (index >= preorder.size()) {
+            return nullptr;
+        }
+
+        TreeNode* cur_node = nullptr;
+        if (preorder[index] != 1001) {
+            cur_node = new TreeNode(preorder[index]);
+        } else {
+            return nullptr;
+        }
+
+        index++;
+        cur_node->left = dfs_deser(preorder, index);
+        index++;
+        cur_node->right = dfs_deser(preorder, index);
+
+        return cur_node;
     }
 };
 
