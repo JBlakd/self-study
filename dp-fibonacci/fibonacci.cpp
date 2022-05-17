@@ -21,6 +21,8 @@ class Solution {
         for (int i = 2; i <= n; ++i) {
             vect[i] = vect[i - 1] + vect[i - 2];
         }
+
+        return vect[n];
     }
 };
 
