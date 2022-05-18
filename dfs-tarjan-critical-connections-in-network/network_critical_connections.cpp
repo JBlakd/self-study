@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <unordered_set>
@@ -50,23 +51,26 @@ class Solution {
                 // Before visiting, remove the in-connection from the neighbour
                 // in other words, turn this bidirectional connection into a unidirectional connection
                 adj[nei].erase(cur_node);
-                cur_low = dfs(nei, time, id, low, adj);
+                int potential_lowest = dfs(nei, time, id, low, adj);
+                low[cur_node] = min(low[cur_node], potential_lowest);
             } else {
                 // already visited, so update current low and return that node's id
-                if (id[nei] <= low[cur_node]) {
-                    low[cur_node] = id[nei];
-                }
+                // if (id[nei] <= low[cur_node]) {
+                //     low[cur_node] = id[nei];
+                // }
+                low[cur_node] = min(low[cur_node], id[nei]);
+                // cout << "test\n";
                 // return id[nei];
             }
         }
 
         // Upon callback, determine if there's a need to update
         // Update if a cycle has been encountered. If this is the case, then cur_low will be smaller or equal to the current low
-        if (cur_low <= low[cur_node]) {
-            low[cur_node] = cur_low;
-        }
+        // if (cur_low <= low[cur_node]) {
+        //     low[cur_node] = cur_low;
+        // }
 
-        return id[cur_node];
+        return low[cur_node];
     }
 };
 
@@ -88,6 +92,17 @@ int main() {
     vector<vector<int>> connections;
     vector<vector<int>> output;
 
+    // {}
+    n = 10;
+    connections = {{1, 0}, {2, 0}, {3, 0}, {4, 1}, {5, 3}, {6, 1}, {7, 2}, {8, 1}, {9, 6}, {9, 3}, {3, 2}, {4, 2}, {7, 4}, {6, 2}, {8, 3}, {4, 0}, {8, 6}, {6, 5}, {6, 3}, {7, 5}, {8, 0}, {8, 5}, {5, 4}, {2, 1}, {9, 5}, {9, 7}, {9, 4}, {4, 3}};
+    output = solution.criticalConnections(n, connections);
+    for (auto bridge : output) {
+        print_vector(bridge);
+        cout << ", ";
+    }
+    cout << endl;
+
+    // {1, 0}
     n = 5;
     connections = {{1, 0}, {2, 0}, {3, 2}, {4, 2}, {4, 3}, {3, 0}, {4, 0}};
     output = solution.criticalConnections(n, connections);
@@ -97,6 +112,7 @@ int main() {
     }
     cout << endl;
 
+    // {0, 1}, {1, 2}, {2, 3}
     n = 9;
     connections = {{0, 1}, {1, 7}, {1, 6}, {7, 6}, {1, 2}, {2, 5}, {5, 4}, {4, 2}, {2, 3}};
     output = solution.criticalConnections(n, connections);
@@ -106,6 +122,7 @@ int main() {
     }
     cout << endl;
 
+    // {1, 3}
     n = 4;
     connections = {{0, 1}, {1, 2}, {2, 0}, {1, 3}};
     output = solution.criticalConnections(n, connections);
@@ -115,6 +132,7 @@ int main() {
     }
     cout << endl;
 
+    // {4, 2}, {5, 2}
     n = 6;
     connections = {{0, 3}, {0, 1}, {0, 2}, {3, 2}, {2, 1}, {4, 2}, {5, 2}};
     output = solution.criticalConnections(n, connections);
