@@ -25,52 +25,40 @@ class Solution {
         int time = 0;
 
         // Start dfs at node 0. This single dfs will cover all nodes due to forgiving question constraints
-        dfs(0, time, id, low, adj);
-
-        // Iterate through connections. Connections with non-equal endpoint values in the low array are bridge connections
         vector<vector<int>> ret;
-        for (auto connection : connections) {
-            if (low[connection[0]] != low[connection[1]]) {
-                ret.push_back(connection);
-            }
-        }
+        dfs(0, -1, time, id, low, adj, ret);
+
         return ret;
     }
 
    private:
-    int dfs(int cur_node, int& time, vector<int>& id, vector<int>& low, vector<unordered_set<int>>& adj) {
+    void dfs(int cur_node, int prev_node, int& time, vector<int>& id, vector<int>& low, vector<unordered_set<int>>& adj, vector<vector<int>>& ret) {
+        // when first visiting (and we only visit each node once), assign id and low to discovery time
         id[cur_node] = time;
         low[cur_node] = time;
         ++time;
-        int cur_low = id[cur_node];
 
+        // For each outgoing edge from cur_node
         for (auto nei : adj[cur_node]) {
-            // check if neighbour is visited by seeing if it has a non -1 id
+            // don't consider the node we just came from
+            if (nei == prev_node) {
+                continue;
+            }
+
+            // if neighbour not yet visited
             if (id[nei] == -1) {
-                // not visited
-                // Before visiting, remove the in-connection from the neighbour
-                // in other words, turn this bidirectional connection into a unidirectional connection
-                adj[nei].erase(cur_node);
-                int potential_lowest = dfs(nei, time, id, low, adj);
-                low[cur_node] = min(low[cur_node], potential_lowest);
+                // visit
+                dfs(nei, cur_node, time, id, low, adj, ret);
+                // on callback, propagate the lowest low value found
+                low[cur_node] = min(low[cur_node], low[nei]);
+                if (id[cur_node] < low[nei]) {
+                    ret.push_back({cur_node, nei});
+                }
             } else {
-                // already visited, so update current low and return that node's id
-                // if (id[nei] <= low[cur_node]) {
-                //     low[cur_node] = id[nei];
-                // }
+                // if neighbour already visited, then propagage the lowest discovery time
                 low[cur_node] = min(low[cur_node], id[nei]);
-                // cout << "test\n";
-                // return id[nei];
             }
         }
-
-        // Upon callback, determine if there's a need to update
-        // Update if a cycle has been encountered. If this is the case, then cur_low will be smaller or equal to the current low
-        // if (cur_low <= low[cur_node]) {
-        //     low[cur_node] = cur_low;
-        // }
-
-        return low[cur_node];
     }
 };
 
@@ -86,6 +74,21 @@ void print_vector(vector<T> vec) {
     cout << "}";
 }
 
+void print_adj_mat(vector<vector<int>>& connections, int n) {
+    vector<vector<bool>> mat(n, vector<bool>(n, false));
+    for (auto connection : connections) {
+        mat[connection[0]][connection[1]] = true;
+        mat[connection[1]][connection[0]] = true;
+    }
+
+    for (auto row : mat) {
+        for (auto element : row) {
+            cout << element << ",";
+        }
+        cout << endl;
+    }
+}
+
 int main() {
     Solution solution;
     int n;
@@ -95,6 +98,7 @@ int main() {
     // {}
     n = 10;
     connections = {{1, 0}, {2, 0}, {3, 0}, {4, 1}, {5, 3}, {6, 1}, {7, 2}, {8, 1}, {9, 6}, {9, 3}, {3, 2}, {4, 2}, {7, 4}, {6, 2}, {8, 3}, {4, 0}, {8, 6}, {6, 5}, {6, 3}, {7, 5}, {8, 0}, {8, 5}, {5, 4}, {2, 1}, {9, 5}, {9, 7}, {9, 4}, {4, 3}};
+    // print_adj_mat(connections, n);
     output = solution.criticalConnections(n, connections);
     for (auto bridge : output) {
         print_vector(bridge);
