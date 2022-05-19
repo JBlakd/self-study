@@ -29,7 +29,7 @@ class Solution {
                 nums[i] + dp[i - 3]);
         }
 
-        return -1;
+        return max(dp[dp.size() - 1], dp[dp.size() - 2]);
     }
 };
 
