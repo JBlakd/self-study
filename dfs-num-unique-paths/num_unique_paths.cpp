@@ -7,7 +7,7 @@ using namespace std;
 class Solution {
    public:
     int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
-        if (obstacleGrid[0][0]) {
+        if (obstacleGrid[0][0] == 1) {
             return 0;
         }
 
@@ -29,27 +29,34 @@ class Solution {
     int rows;
     int cols;
 
-    void dfs(int row, int col, int& count, vector<vector<int>>& obstacleGrid) {
-        if (row == rows - 1 && col == cols - 1) {
+    bool dfs(int row, int col, int& count, vector<vector<int>>& obstacleGrid) {
+        if (obstacleGrid[row][col] == 2 || row == rows - 1 && col == cols - 1) {
             ++count;
-            return;
+            return true;
         }
 
         // No need to visit
         // obstacleGrid[row}[col} = 1;
 
+        bool reachable_to_goal = false;
         // calculate neighbours
         if (is_visitable(row, col + 1, obstacleGrid)) {
-            dfs(row, col + 1, count, obstacleGrid);
+            reachable_to_goal = dfs(row, col + 1, count, obstacleGrid);
         }
         if (is_visitable(row + 1, col, obstacleGrid)) {
-            dfs(row + 1, col, count, obstacleGrid);
+            reachable_to_goal = dfs(row + 1, col, count, obstacleGrid);
         }
+
+        if (reachable_to_goal) {
+            obstacleGrid[row][col] = 2;
+        }
+
+        return reachable_to_goal;
     }
 
     bool is_visitable(int row, int col, vector<vector<int>>& obstacleGrid) {
         // return false if out of bounds or is visited
-        if (row < 0 || col < 0 || row >= rows || col >= cols || obstacleGrid[row][col]) {
+        if (row < 0 || col < 0 || row >= rows || col >= cols || obstacleGrid[row][col] == 1) {
             return false;
         }
         return true;
@@ -59,13 +66,21 @@ class Solution {
 int main() {
     Solution solution;
     vector<vector<int>> obstableGrid;
-    // // 7
-    // obstableGrid = {{0, 0, 0, 0},
-    //                 {0, 1, 0, 0},
-    //                 {0, 0, 0, 0},
-    //                 {0, 0, 1, 0},
-    //                 {0, 0, 0, 0}};
-    // cout << solution.uniquePathsWithObstacles(obstableGrid) << endl;
+
+    // 10
+    obstableGrid = {{0, 0, 0, 0, 0},
+                    {0, 0, 0, 0, 1},
+                    {0, 0, 0, 1, 0},
+                    {0, 0, 0, 0, 0}};
+    cout << solution.uniquePathsWithObstacles(obstableGrid) << endl;
+
+    // 7
+    obstableGrid = {{0, 0, 0, 0},
+                    {0, 1, 0, 0},
+                    {0, 0, 0, 0},
+                    {0, 0, 1, 0},
+                    {0, 0, 0, 0}};
+    cout << solution.uniquePathsWithObstacles(obstableGrid) << endl;
 
     // 2768280
     obstableGrid = {
