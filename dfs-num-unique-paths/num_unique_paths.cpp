@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -7,59 +8,57 @@ using namespace std;
 class Solution {
    public:
     int uniquePathsWithObstacles(vector<vector<int>>& obstacleGrid) {
-        if (obstacleGrid[0][0] == 1) {
+        int rows = obstacleGrid.size();
+        int cols = obstacleGrid[0].size();
+        if (obstacleGrid[0][0] == 1 || obstacleGrid[rows - 1][cols - 1] == 1) {
             return 0;
         }
 
-        rows = obstacleGrid.size();
-        cols = obstacleGrid[0].size();
+        obstacleGrid[0][0] = -1;
+        vector<vector<int>> neighbours;
 
-        // Approach:
-        // DFS until reached destination
-        // No need to mark nodes as visited or we might block future recursions
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                // reject if is an obstacle
+                if (obstacleGrid[i][j] == 1) {
+                    continue;
+                }
 
-        // Need to memoise nodes which are reachable to the destination, or the solution won't be fast enough
+                get_neighbours(i, j, neighbours, obstacleGrid);
 
-        int count = 0;
-        dfs(0, 0, count, obstacleGrid);
-        return count;
+                if (neighbours.size() == 2) {
+                    obstacleGrid[i][j] = obstacleGrid[neighbours[0][0]][neighbours[0][1]] + obstacleGrid[neighbours[1][0]][neighbours[1][1]];
+                } else if (neighbours.size() == 1) {
+                    // Same as neighbour
+                    obstacleGrid[i][j] = obstacleGrid[neighbours[0][0]][neighbours[0][1]];
+                } else {
+                    if (i == 0 && j == 0) {
+                        obstacleGrid[0][0] = -1;
+                    } else {
+                        obstacleGrid[i][j] = 0;
+                    }
+                }
+            }
+        }
+
+        return -obstacleGrid[rows - 1][cols - 1];
     }
 
    private:
-    int rows;
-    int cols;
+    void get_neighbours(int row, int col, vector<vector<int>>& neighbours, vector<vector<int>>& obstacleGrid) {
+        neighbours.resize(0);
 
-    bool dfs(int row, int col, int& count, vector<vector<int>>& obstacleGrid) {
-        if (obstacleGrid[row][col] == 2 || row == rows - 1 && col == cols - 1) {
-            ++count;
-            return true;
+        int nei_row = row - 1;
+        int nei_col = col;
+        if (nei_row >= 0 && nei_col >= 0 && nei_row < obstacleGrid.size() && nei_col < obstacleGrid[0].size() && obstacleGrid[nei_row][nei_col] != 1) {
+            neighbours.push_back({nei_row, nei_col});
         }
 
-        // No need to visit
-        // obstacleGrid[row}[col} = 1;
-
-        bool reachable_to_goal = false;
-        // calculate neighbours
-        if (is_visitable(row, col + 1, obstacleGrid)) {
-            reachable_to_goal = dfs(row, col + 1, count, obstacleGrid);
+        nei_row = row;
+        nei_col = col - 1;
+        if (nei_row >= 0 && nei_col >= 0 && nei_row < obstacleGrid.size() && nei_col < obstacleGrid[0].size() && obstacleGrid[nei_row][nei_col] != 1) {
+            neighbours.push_back({nei_row, nei_col});
         }
-        if (is_visitable(row + 1, col, obstacleGrid)) {
-            reachable_to_goal = dfs(row + 1, col, count, obstacleGrid);
-        }
-
-        if (reachable_to_goal) {
-            obstacleGrid[row][col] = 2;
-        }
-
-        return reachable_to_goal;
-    }
-
-    bool is_visitable(int row, int col, vector<vector<int>>& obstacleGrid) {
-        // return false if out of bounds or is visited
-        if (row < 0 || col < 0 || row >= rows || col >= cols || obstacleGrid[row][col] == 1) {
-            return false;
-        }
-        return true;
     }
 };
 
@@ -68,11 +67,11 @@ int main() {
     vector<vector<int>> obstableGrid;
 
     // 10
-    obstableGrid = {{0, 0, 0, 0, 0},
-                    {0, 0, 0, 0, 1},
-                    {0, 0, 0, 1, 0},
-                    {0, 0, 0, 0, 0}};
-    cout << solution.uniquePathsWithObstacles(obstableGrid) << endl;
+    // obstableGrid = {{0, 0, 0, 0, 0},
+    //                 {0, 0, 0, 0, 1},
+    //                 {0, 0, 0, 1, 0},
+    //                 {0, 0, 0, 0, 0}};
+    // cout << solution.uniquePathsWithObstacles(obstableGrid) << endl;
 
     // 7
     obstableGrid = {{0, 0, 0, 0},
