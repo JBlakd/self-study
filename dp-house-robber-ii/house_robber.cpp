@@ -15,16 +15,18 @@ class Solution {
         if (nums.size() == 2) {
             return max(nums[0], nums[1]);
         }
+
+        return max(robbie_rotten(1, nums.size() - 2, nums), robbie_rotten(2, nums.size() - 1, nums));
     }
 
    private:
     int robbie_rotten(int start, int end, vector<int>& nums) {
         // intuition: It only makes sense for the robber to skip 1 house or skip 2 houses
         // Therefore, to get to where I am now, I must have been previously 2 houses away or 3 houses away
-        vector<int> dp(nums.size());
-        dp[0] = nums[0];
-        dp[1] = nums[1];
-        dp[2] = dp[0] + nums[2];
+        vector<int> dp(end - start + 1);
+        dp[0] = nums[start];
+        dp[1] = nums[start + 1];
+        dp[2] = dp[0] + nums[start + 2];
 
         for (int i = 3; i < dp.size(); ++i) {
             dp[i] = max(
