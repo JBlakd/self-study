@@ -8,25 +8,33 @@ using namespace std;
 class Solution {
    public:
     int coinChange(vector<int>& coins, int amount) {
-        sort(coins.begin(), coins.end(), greater<int>());
+        // vector size has to be amount + 1, because the last index must be amount
+        vector<int> dp(amount + 1, 0);
+        dp[0] = 0;
 
-        int ret = 0;
+        // Useful for the start index of the loop
+        // sort(coins.begin(), coins.end());
+        // Make sure the start index of the loop will result in dp having the first valid value
 
-        for (int coin : coins) {
-            if (coin > amount) {
-                continue;
+        for (int i = 1; i <= amount; ++i) {
+            int min_prev_coins = 10001;
+            for (int coin_val : coins) {
+                if (i - coin_val < 0 || dp[i - coin_val] == 10002) {
+                    continue;
+                }
+
+                if (dp[i - coin_val] < min_prev_coins) {
+                    min_prev_coins = dp[i - coin_val];
+                }
             }
-
-            int num_coins_used = amount / coin;
-            ret += num_coins_used;
-            amount -= num_coins_used * coin;
+            // If no valid coins found, then dp[i] = 10002
+            dp[i] = min_prev_coins + 1;
         }
 
-        if (amount == 0) {
-            return ret;
-        } else {
+        if (dp[amount] == 10002) {
             return -1;
         }
+        return dp[amount];
     }
 };
 
