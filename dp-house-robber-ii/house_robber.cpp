@@ -16,11 +16,19 @@ class Solution {
             return max(nums[0], nums[1]);
         }
 
-        return max(robbie_rotten(1, nums.size() - 2, nums), robbie_rotten(2, nums.size() - 1, nums));
+        return max(robbie_rotten(0, nums.size() - 2, nums), robbie_rotten(1, nums.size() - 1, nums));
     }
 
    private:
     int robbie_rotten(int start, int end, vector<int>& nums) {
+        if (end - start == 0) {
+            return nums[start];
+        }
+
+        if (end - start == 1) {
+            return max(nums[start], nums[end]);
+        }
+
         // intuition: It only makes sense for the robber to skip 1 house or skip 2 houses
         // Therefore, to get to where I am now, I must have been previously 2 houses away or 3 houses away
         vector<int> dp(end - start + 1);
@@ -30,8 +38,8 @@ class Solution {
 
         for (int i = 3; i < dp.size(); ++i) {
             dp[i] = max(
-                nums[i] + dp[i - 2],
-                nums[i] + dp[i - 3]);
+                nums[start + i] + dp[i - 2],
+                nums[start + i] + dp[i - 3]);
         }
 
         return max(dp[dp.size() - 1], dp[dp.size() - 2]);
@@ -52,4 +60,13 @@ void print_vector(vector<T> vec) {
 
 int main() {
     Solution solution;
+    vector<int> nums;
+    nums = {2, 7, 9, 3, 1};
+    cout << solution.rob(nums) << endl;
+
+    nums = {2, 3, 2};
+    cout << solution.rob(nums) << endl;
+
+    nums = {1, 2, 3, 1};
+    cout << solution.rob(nums) << endl;
 }
