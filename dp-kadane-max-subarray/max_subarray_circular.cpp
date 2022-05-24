@@ -15,8 +15,8 @@ class Solution {
 
    private:
     int find_max_subarray(vector<int>& nums) {
-        int local_max = -10001;
-        int global_max = -10001;
+        int local_max = -30001;
+        int global_max = -30001;
         for (int i = 0; i < nums.size(); ++i) {
             local_max = max(nums[i], nums[i] + local_max);
             global_max = max(global_max, local_max);
@@ -27,8 +27,8 @@ class Solution {
     }
 
     int find_min_subarray(vector<int>& nums) {
-        int local_min = 10001;
-        int global_min = 10001;
+        int local_min = 30001;
+        int global_min = 30001;
         // Must not include first and last elements due to wraparound issue
         for (int i = 1; i < nums.size() - 1; ++i) {
             local_min = min(nums[i], nums[i] + local_min);
