@@ -1,5 +1,6 @@
+#include <algorithm>
 #include <iostream>
-#include <queue>
+#include <limits>
 #include <string>
 #include <vector>
 
@@ -20,35 +21,33 @@ class Solution {
             adj[flight[0]].emplace_back(flight[1], flight[2]);
         }
 
-        // Initialize distance vector
-        // Index denotes dst, value denotes shortest found distance so far
-        vector<int> dist(n, 10001);
-
-        queue<int> todo;
-        dist[src] = 0;
-        todo.push(src);
-
-        // TODO: check k condition
-        while (k >= 0) {
-            int cur_depth_nodes = todo.size();
-            for (int i = 0; i < cur_depth_nodes; ++i) {
-                int cur_node = todo.front();
-                todo.pop();
-                for (auto& [nei, weight] : adj[cur_node]) {
-                    if (dist[cur_node] + weight < dist[nei]) {
-                        dist[nei] = dist[cur_node] + weight;
-                        todo.push(nei);
-                    }
-                }
-            }
-            // All node of the same depth explored. Can decrement k;
-            k--;
-        }
-
-        if (dist[dst] == 10001) {
+        int ret = numeric_limits<int>::max();
+        dfs(src, dst, k + 1, 0, ret, adj);
+        if (ret == numeric_limits<int>::max()) {
             return -1;
         }
-        return dist[dst];
+        return ret;
+    }
+
+   private:
+    void dfs(int cur_node, int dst, int num_jumps_allowed, int cur_price, int& ret, vector<vector<pair<int, int>>>& adj) {
+        // Base case: node found
+        if (cur_node == dst) {
+            ret = min(ret, cur_price);
+            return;
+        }
+
+        if (num_jumps_allowed == 0) {
+            return;
+        }
+
+        for (auto& [nei, nei_price] : adj[cur_node]) {
+            // don't explore a neighbour if it costs more than answer found so far
+            if (cur_price + nei_price > ret) {
+                continue;
+            }
+            dfs(nei, dst, num_jumps_allowed - 1, cur_price + nei_price, ret, adj);
+        }
     }
 };
 
@@ -71,6 +70,14 @@ int main() {
     int src;
     int dst;
     int k;
+
+    // 30054
+    n = 10;
+    flights = {{0, 1, 20}, {1, 2, 20}, {2, 3, 30}, {3, 4, 30}, {4, 5, 30}, {5, 6, 30}, {6, 7, 30}, {7, 8, 30}, {8, 9, 30}, {0, 2, 9999}, {2, 4, 9998}, {4, 7, 9997}};
+    src = 0;
+    dst = 9;
+    k = 4;
+    cout << solution.findCheapestPrice(n, flights, src, dst, k) << endl;
 
     // 6
     n = 4;
