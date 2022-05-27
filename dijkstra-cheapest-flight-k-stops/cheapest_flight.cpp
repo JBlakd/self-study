@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <limits>
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -21,33 +22,13 @@ class Solution {
             adj[flight[0]].emplace_back(flight[1], flight[2]);
         }
 
-        int ret = numeric_limits<int>::max();
-        dfs(src, dst, k + 1, 0, ret, adj);
-        if (ret == numeric_limits<int>::max()) {
-            return -1;
-        }
-        return ret;
-    }
+        // Have to modify dijkstra to allow revisiting of nodes if:
+        // - Just found a path with shorter distance
+        // - Just found a path with fewer stops
 
-   private:
-    void dfs(int cur_node, int dst, int num_jumps_allowed, int cur_price, int& ret, vector<vector<pair<int, int>>>& adj) {
-        // Base case: node found
-        if (cur_node == dst) {
-            ret = min(ret, cur_price);
-            return;
-        }
-
-        if (num_jumps_allowed == 0) {
-            return;
-        }
-
-        for (auto& [nei, nei_price] : adj[cur_node]) {
-            // don't explore a neighbour if it costs more than answer found so far
-            if (cur_price + nei_price > ret) {
-                continue;
-            }
-            dfs(nei, dst, num_jumps_allowed - 1, cur_price + nei_price, ret, adj);
-        }
+        // TODO: for complicates shit like this, it's better to track statistics at each node.
+        // i.e. at the current node, track the cost it took to get here using the current path (though we still prioritise shortest path found)
+        // also track the stops it took to get here at the current node
     }
 };
 
