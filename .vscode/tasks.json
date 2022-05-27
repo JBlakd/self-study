@@ -25,6 +25,7 @@
       "label": "C/C++: g++.exe build active file ver(1)",
       "command": "g++",
       "args": [
+        "-std=c++17",
         "-fdiagnostics-color=always",
         "-g",
         "${file}",
