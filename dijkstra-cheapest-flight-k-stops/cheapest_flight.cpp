@@ -22,13 +22,56 @@ class Solution {
             adj[flight[0]].emplace_back(flight[1], flight[2]);
         }
 
+        // shortest dist vector
+        // Index denotes node, dist[i] denotes shortest distance found to that node
+        vector<int> dist(n, numeric_limits<int>::max());
+        vector<int> jumps(n, numeric_limits<int>::max());
+
         // Have to modify dijkstra to allow revisiting of nodes if:
         // - Just found a path with shorter distance
         // - Just found a path with fewer stops
 
-        // TODO: for complicates shit like this, it's better to track statistics at each node.
+        // For complicates shit like this, it's better to track statistics at each node.
         // i.e. at the current node, track the cost it took to get here using the current path (though we still prioritise shortest path found)
         // also track the stops it took to get here at the current node
+        // MinPQ by edge weight. tuple<weight, stops, node>
+        priority_queue<tuple<int, int, int>, vector<tuple<int, int, int>>, greater<tuple<int, int, int>>> pq;
+        dist[src] = 0;
+        jumps[src] = 0;
+        pq.emplace(0, 0, src);
+
+        while (!pq.empty()) {
+            auto [cur_weight, cur_stops, cur_node] = pq.top();
+            pq.pop();
+            if (cur_node == dst) {
+                return cur_weight;
+            }
+            // Reject neighbours with too many stops
+            if (cur_stops > k) {
+                continue;
+            }
+            for (auto& [nei, nei_weight] : adj[cur_node]) {
+                // we've reached the penultimate destination. If the nei isn't dst, don't touch shit.
+                if (cur_stops == k && nei != dst) {
+                    continue;
+                }
+                // One of two revisit conditions must be satisfied
+                if (cur_weight + nei_weight < dist[nei]) {
+                    dist[nei] = cur_weight + nei_weight;
+                    jumps[nei] = cur_stops + 1;
+                    pq.emplace(dist[nei], jumps[nei], nei);
+                } else if (cur_stops + 1 < jumps[nei]) {
+                    jumps[nei] = cur_stops + 1;
+                    // KEY!!! First argument CANNOT BE dist[nei]!!!
+                    pq.emplace(cur_weight + nei_weight, jumps[nei], nei);
+                }
+            }
+        }
+
+        if (dist[dst] == numeric_limits<int>::max()) {
+            return -1;
+        }
+        return dist[dst];
     }
 };
 
@@ -51,6 +94,22 @@ int main() {
     int src;
     int dst;
     int k;
+
+    // 10
+    n = 9;
+    flights = {{0, 1, 1}, {1, 2, 1}, {2, 3, 1}, {3, 7, 1}, {0, 4, 3}, {4, 5, 3}, {5, 7, 3}, {0, 6, 5}, {6, 7, 100}, {7, 8, 1}};
+    src = 0;
+    dst = 8;
+    k = 3;
+    cout << solution.findCheapestPrice(n, flights, src, dst, k) << endl;
+
+    // 7
+    n = 5;
+    flights = {{0, 1, 5}, {1, 2, 5}, {0, 3, 2}, {3, 1, 2}, {1, 4, 1}, {4, 2, 1}};
+    src = 0;
+    dst = 2;
+    k = 2;
+    cout << solution.findCheapestPrice(n, flights, src, dst, k) << endl;
 
     // 30054
     n = 10;
