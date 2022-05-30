@@ -21,15 +21,32 @@ class Solution {
 
         // See how many times we can subtract divisor from dividend without going below zero
         int ret = 0;
-        while (dividend_pos >= divisor_pos) {
-            dividend_pos -= divisor_pos;
-            ++ret;
+        // dividend = (quotient) * divisor + remainder
+        // The goal is to express the quotient in powers of 2
+        // Find the maximum power of 2 that we could multiply divisor by and still be less than dividend
+        int max_pow = 0;
+        for (int i = 0; i <= 32; ++i) {
+            if (i == 32 || divisor_pos << i > dividend_pos) {
+                max_pow = i - 1;
+                break;
+            }
         }
 
-        // Instead of repeated subtractions. We keep doubling the divisor until it cannot be doubled anymore, and then
+        while (max_pow >= 0) {
+            if (dividend_pos >= (divisor_pos << max_pow)) {
+                dividend_pos -= (divisor_pos << max_pow);
+                ret += (1 << max_pow);
+            }
+            --max_pow;
+        }
 
         // Convert the answer into negative if necessary
-        if (is_negative) {
+        if (is_negative && !(ret & (1 << 31)) && ret != numeric_limits<int>::min()) {
+            ret = ~ret + 1;
+        }
+
+        // Convert the answer into positive if necessary
+        if (!is_negative && (ret & (1 << 31))) {
             ret = ~ret + 1;
         }
 
@@ -54,30 +71,52 @@ int main() {
     int dividend;
     int divisor;
 
+    // 1
+    dividend = -2147483648;
+    divisor = -2147483648;
+    cout << solution.divide(dividend, divisor) << endl;
+
+    // -1073741824
+    dividend = -2147483648;
+    divisor = 2;
+    cout << solution.divide(dividend, divisor) << endl;
+
+    // -2147483648
     dividend = -2147483648;
     divisor = 1;
     cout << solution.divide(dividend, divisor) << endl;
 
-    dividend = -10;
-    divisor = 3;
+    // 0
+    dividend = 65;
+    divisor = 80;
     cout << solution.divide(dividend, divisor) << endl;
 
-    dividend = 111;
-    divisor = 7;
-    cout << solution.divide(dividend, divisor) << endl;
-
-    dividend = 7;
-    divisor = -3;
-    cout << solution.divide(dividend, divisor) << endl;
-
+    // 1
     dividend = 65;
     divisor = 58;
     cout << solution.divide(dividend, divisor) << endl;
 
+    // -3
+    dividend = -10;
+    divisor = 3;
+    cout << solution.divide(dividend, divisor) << endl;
+
+    // 15
+    dividend = 111;
+    divisor = 7;
+    cout << solution.divide(dividend, divisor) << endl;
+
+    // -2
+    dividend = 7;
+    divisor = -3;
+    cout << solution.divide(dividend, divisor) << endl;
+
+    // 2147483647
     dividend = -2147483648;
     divisor = -1;
     cout << solution.divide(dividend, divisor) << endl;
 
+    // 9
     dividend = 65;
     divisor = 7;
     cout << solution.divide(dividend, divisor) << endl;
