@@ -116,7 +116,7 @@ Number,Name,Difficulty,Time Req,Category,DONE?
 115,Generate Parentheses,Medium,25 mins,Recursion,0
 116,Sort List,Medium,25 mins,Linked List,0
 117,Number of Connected Components in an Undirected Graph,Medium,30 mins,Graph,0
-118,Minimum Knight Moves,Medium,35 mins,Graph,0
+118,Minimum Knight Moves,Medium,35 mins,Graph,1
 119,Subarray Sum Equals K,Medium,35 mins,Array,0
 120,Asteroid Collision,Medium,30 mins,Stack,0
 121,Random Pick with Weight,Medium,25 mins,Math,0
