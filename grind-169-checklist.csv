@@ -142,7 +142,7 @@ Number,Name,Difficulty,Time Req,Category,DONE?
 141,Symmetric Tree,Easy,20 mins,Binary Tree,0
 142,Missing Number,Easy,15 mins,Binary,0
 143,Decode Ways,Medium,25 mins,Dynamic Programming,0
-144,Meeting Rooms II,Medium,30 mins,Array,0
+144,Meeting Rooms II,Medium,30 mins,Array,1
 145,Reverse Integer,Medium,25 mins,Math,0
 146,Set Matrix Zeroes,Medium,25 mins,Matrix,0
 147,Reorder List,Medium,25 mins,Linked List,0
