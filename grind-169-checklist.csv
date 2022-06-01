@@ -76,7 +76,7 @@ Number,Name,Difficulty,Time Req,Category,DONE?
 75,Kth Smallest Element in a BST,Medium,25 mins,Binary Search Tree,0
 76,Daily Temperatures,Medium,30 mins,Stack,0
 77,House Robber,Medium,25 mins,Dynamic Programming,1
-78,Meeting Rooms,Easy,20 mins,Array,0
+78,Meeting Rooms,Easy,20 mins,Array,1
 79,Roman to Integer,Easy,20 mins,Math,0
 80,Backspace String Compare,Easy,15 mins,Stack,0
 81,Gas Station,Medium,30 mins,Array,0
