@@ -56,7 +56,13 @@
         "xmemory": "cpp",
         "xtr1common": "cpp",
         "xtree": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "iomanip": "cpp",
+        "numeric": "cpp",
+        "sstream": "cpp",
+        "xlocmon": "cpp",
+        "xloctime": "cpp",
+        "xmemory0": "cpp"
     },
     "editor.formatOnSave": true,
     "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 0}"
