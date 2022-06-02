@@ -11,7 +11,7 @@ Number,Name,Difficulty,Time Req,Category,DONE?
 10,Maximum Subarray,Easy,20 mins,Dynamic Programming,1
 11,Lowest Common Ancestor of a Binary Search Tree,Easy,20 mins,Binary Search Tree,1
 12,Insert Interval,Medium,25 mins,Array,1
-13,01 Matrix,Medium,30 mins,Graph,0
+13,01 Matrix,Medium,30 mins,Graph,1
 14,K Closest Points to Origin,Medium,30 mins,Heap,1
 15,Balanced Binary Tree,Easy,15 mins,Binary Tree,1
 16,Linked List Cycle,Easy,20 mins,Linked List,1
