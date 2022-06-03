@@ -16,7 +16,7 @@ Number,Name,Difficulty,Time Req,Category,DONE?
 15,Balanced Binary Tree,Easy,15 mins,Binary Tree,1
 16,Linked List Cycle,Easy,20 mins,Linked List,1
 17,Implement Queue using Stacks,Easy,20 mins,Stack,0
-18,First Bad Version,Easy,20 mins,Binary Search,0
+18,First Bad Version,Easy,20 mins,Binary Search,1
 19,Ransom Note,Easy,15 mins,Hash Table,1
 20,Longest Substring Without Repeating Characters,Medium,30 mins,String,0
 21,3Sum,Medium,30 mins,Array,1
