@@ -7,7 +7,7 @@ Number,Name,Difficulty,Time Req,Category,DONE?
 6,Invert Binary Tree,Easy,15 mins,Binary Tree,1
 7,Valid Anagram,Easy,15 mins,String,1
 8,Binary Search,Easy,15 mins,Binary Search,1
-9,Flood Fill,Easy,20 mins,Graph,0
+9,Flood Fill,Easy,20 mins,Graph,1
 10,Maximum Subarray,Easy,20 mins,Dynamic Programming,1
 11,Lowest Common Ancestor of a Binary Search Tree,Easy,20 mins,Binary Search Tree,1
 12,Insert Interval,Medium,25 mins,Array,1
