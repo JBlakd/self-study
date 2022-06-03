@@ -28,7 +28,7 @@ Number,Name,Difficulty,Time Req,Category,DONE?
 27,Coin Change,Medium,25 mins,Dynamic Programming,1
 28,Product of Array Except Self,Medium,30 mins,Array,0
 29,Climbing Stairs,Easy,20 mins,Dynamic Programming,1
-30,Longest Palindrome,Easy,20 mins,String,0
+30,Longest Palindrome,Easy,20 mins,String,1
 31,Min Stack,Easy,20 mins,Stack,0
 32,Reverse Linked List,Easy,20 mins,Linked List,1
 33,Validate Binary Search Tree,Medium,20 mins,Binary Search Tree,1
