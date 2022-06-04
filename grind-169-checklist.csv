@@ -166,5 +166,5 @@ Number,Name,Difficulty,Time Req,Category,DONE?
 165,Reverse Nodes in k-Group,Hard,35 mins,Linked List,0
 166,Sudoku Solver,Hard,40 mins,Matrix,0
 167,First Missing Positive,Hard,35 mins,Hash Table,0
-168,N-Queens,Hard,40 mins,Recursion,0
+168,N-Queens,Hard,40 mins,Recursion,1
 169,Smallest Range Covering Elements from K Lists,Hard,40 mins,Heap,0
