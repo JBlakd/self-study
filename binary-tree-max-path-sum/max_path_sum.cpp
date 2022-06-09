@@ -55,9 +55,13 @@ class Solution {
         hashmap[cur_node] = {0, 0};
         if (cur_node->left != nullptr) {
             hashmap[cur_node].first = max(hashmap[cur_node->left].first + cur_node->left->val, hashmap[cur_node->left].second + cur_node->left->val);
+            // See if not proceeding is more advantageous than proceeding
+            hashmap[cur_node].first = max(hashmap[cur_node].first, 0);
         }
         if (cur_node->right != nullptr) {
             hashmap[cur_node].second = max(hashmap[cur_node->right].first + cur_node->right->val, hashmap[cur_node->right].second + cur_node->right->val);
+            // See if not proceeding is more advantageous than proceeding
+            hashmap[cur_node].second = max(hashmap[cur_node].second, 0);
         }
     }
 };
