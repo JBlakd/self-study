@@ -16,15 +16,27 @@ struct ListNode {
 class Solution {
    public:
     ListNode* removeNthFromEnd(ListNode* head, int n) {
+        if (head->next == nullptr) {
+            return nullptr;
+        }
+
         queue<ListNode*> q;
         ListNode* cur_node = head;
 
+        int count = 0;
         while (cur_node != nullptr) {
             q.emplace(cur_node);
             if (q.size() > n + 1) {
                 q.pop();
             }
             cur_node = cur_node->next;
+            ++count;
+        }
+        if (n == count) {
+            ListNode* prev_head = head;
+            head = head->next;
+            prev_head->next = nullptr;
+            return head;
         }
 
         ListNode* prev = q.front();
