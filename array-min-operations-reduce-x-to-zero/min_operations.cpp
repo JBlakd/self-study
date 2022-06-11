@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <iostream>
+#include <limits>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 using namespace std;
@@ -8,46 +10,38 @@ using namespace std;
 class Solution {
    public:
     int minOperations(vector<int>& nums, int x) {
-        // Changed perspective: Find the longest subarray equal to total sum - x
-        vector<int> prefix_sum(nums.size(), nums[0]);
-        for (int i = 1; i < nums.size(); ++i) {
-            prefix_sum[i] = prefix_sum[i - 1] + nums[i];
-        }
-        int target = prefix_sum.back() - x;
-
-        // Edge case: the input array sums up to x
-        if (target == 0) {
-            return nums.size();
-        }
-
-        // Ever decreasing sliding window
-        int lo = 0;
-        int hi = prefix_sum.size() - 1;
-        while (lo <= hi) {
-            int window_sum;
-            if (lo == 0) {
-                window_sum = prefix_sum[hi];
-            } else {
-                window_sum = prefix_sum[hi] - prefix_sum[lo - 1];
-            }
-
-            // check if suitable window found
-            if (window_sum == target) {
-                return nums.size() - (hi - lo + 1);
-            }
-
-            ++hi;
-            ++lo;
-
-            // check if need to decrease sliding window
-            if (hi >= prefix_sum.size()) {
-                // new window size == (hi - lo)
-                hi = hi - lo - 1;
-                lo = 0;
+        // <left_rolling_sum, num elements removed from left>
+        unordered_map<int, int> hashmap;
+        hashmap[0] = 0;
+        int sum = 0;
+        // Populate the hashmap from the left
+        for (int i = 1; i <= nums.size(); ++i) {
+            sum += nums[i - 1];
+            if (sum <= x) {
+                hashmap[sum] = i;
             }
         }
 
-        return -1;
+        if (sum < x) {
+            return -1;
+        }
+
+        // Find complement from the right
+        int complement = x;
+        // Check for the case where we don't need to remove anything from the right
+        int ret = numeric_limits<int>::max();
+        if (hashmap.find(complement) != hashmap.end()) {
+            ret = hashmap.at(complement);
+        }
+        for (int i = nums.size() - 1; i >= 0; --i) {
+            complement -= nums[i];
+            if (hashmap.find(complement) != hashmap.end()) {
+                // number of elements removed from the right == nums.size() - i
+                int cur_elements_removed = (nums.size() - i) + hashmap.at(complement);
+                ret = min(ret, cur_elements_removed);
+            }
+        }
+        return (ret == numeric_limits<int>::max()) ? -1 : ret;
     }
 };
 
@@ -68,9 +62,29 @@ int main() {
     vector<int> nums;
     int x;
 
-    // 16
-    nums = {8828, 9581, 49, 9818, 9974, 9869, 9991, 10000, 10000, 10000, 9999, 9993, 9904, 8819, 1231, 6309};
-    x = 134365;
+    // -1
+    nums = {1, 1};
+    x = 3;
+    cout << solution.minOperations(nums, x) << '\n';
+
+    // 1
+    nums = {1, 1, 3, 2, 5};
+    x = 5;
+    cout << solution.minOperations(nums, x) << '\n';
+
+    // 2
+    nums = {1, 1, 4, 2, 3};
+    x = 5;
+    cout << solution.minOperations(nums, x) << '\n';
+
+    // 2
+    nums = {1, 3, 4, 1};
+    x = 4;
+    cout << solution.minOperations(nums, x) << '\n';
+
+    // 5
+    nums = {3, 2, 20, 1, 1, 3};
+    x = 10;
     cout << solution.minOperations(nums, x) << '\n';
 
     // 4
@@ -78,9 +92,9 @@ int main() {
     x = 9;
     cout << solution.minOperations(nums, x) << '\n';
 
-    // 2
-    nums = {1, 3, 4, 1};
-    x = 4;
+    // 16
+    nums = {8828, 9581, 49, 9818, 9974, 9869, 9991, 10000, 10000, 10000, 9999, 9993, 9904, 8819, 1231, 6309};
+    x = 134365;
     cout << solution.minOperations(nums, x) << '\n';
 
     // 113
@@ -91,16 +105,6 @@ int main() {
     // 6
     nums = {6016, 5483, 541, 4325, 8149, 3515, 7865, 2209, 9623, 9763, 4052, 6540, 2123, 2074, 765, 7520, 4941, 5290, 5868, 6150, 6006, 6077, 2856, 7826, 9119};
     x = 31841;
-    cout << solution.minOperations(nums, x) << '\n';
-
-    // 5
-    nums = {3, 2, 20, 1, 1, 3};
-    x = 10;
-    cout << solution.minOperations(nums, x) << '\n';
-
-    // 2
-    nums = {1, 1, 4, 2, 3};
-    x = 5;
     cout << solution.minOperations(nums, x) << '\n';
 
     // -1
