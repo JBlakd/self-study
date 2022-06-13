@@ -22,4 +22,8 @@ void print_vector(vector<T> vec) {
 
 int main() {
     Solution solution;
+
+    /* UNIT TESTS HERE */
+
+    cout << "Great success!" << '\n';
 }
