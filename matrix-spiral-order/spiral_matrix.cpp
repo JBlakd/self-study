@@ -10,50 +10,53 @@ class Solution {
     vector<int> spiralOrder(vector<vector<int>>& matrix) {
         int min_row = 0;
         int min_col = 0;
-        int rows = matrix.size();
-        int cols = matrix[0].size();
+        int max_row = matrix.size() - 1;
+        int max_col = matrix[0].size() - 1;
+
         // right, down, left, up
-        vector<pair<int, int>> dirs = {{0, 1}, {1, 0}, {0, -1}, {-1, 0}};
-        int dirs_idx = 0;
-        int cur_row = 0, cur_col = 0;
+        string dirs = "rdlu";
+        int cur_dir = 0;
 
-        vector<int> ret(rows * cols);
-        for (int i = 0; i < ret.size(); ++i) {
-            int dirs_idx_modded = dirs_idx % dirs.size();
-            auto& [dy, dx] = dirs[dirs_idx_modded];
+        int i = 0;
+        vector<int> ret((max_row + 1) * (max_col + 1));
 
-            ret[i] = matrix[cur_row][cur_col];
-
-            if ((cur_row == rows - 1 && dirs_idx_modded == 1) || (cur_col == cols - 1 && dirs_idx_modded == 0) ||
-                (cur_row == min_row && dirs_idx_modded == 3) || (cur_col == min_col && dirs_idx_modded == 2)) {
-                // Reached the end
-
-                // Change limit
-                if (dirs_idx_modded == 0) {
-                    // right
-                    ++min_row;
-                } else if (dirs_idx_modded == 1) {
-                    // down
-                    --cols;
-                } else if (dirs_idx_modded == 2) {
-                    // left
-                    --rows;
-                } else {
-                    // up
-                    ++min_col;
+        while (i < ret.size()) {
+            if (dirs[cur_dir % dirs.length()] == 'r') {
+                // traverse right
+                for (int col = min_col; col <= max_col; ++col) {
+                    ret[i] = matrix[min_row][col];
+                    ++i;
                 }
-
-                // change direction
-                ++dirs_idx;
-                dirs_idx_modded = dirs_idx % dirs.size();
-                auto& [dy, dx] = dirs[dirs_idx_modded];
-                cur_row += dy;
-                cur_col += dx;
-                continue;
+                // modify limit
+                ++min_row;
+            } else if (dirs[cur_dir % dirs.length()] == 'd') {
+                // traverse down
+                for (int row = min_row; row <= max_row; ++row) {
+                    ret[i] = matrix[row][max_col];
+                    ++i;
+                }
+                // modify limit
+                --max_col;
+            } else if (dirs[cur_dir % dirs.length()] == 'l') {
+                // traverse left
+                for (int col = max_col; col >= min_col; --col) {
+                    ret[i] = matrix[max_row][col];
+                    ++i;
+                }
+                // modify limit
+                --max_row;
+            } else {
+                // traverse up
+                for (int row = max_row; row >= min_row; --row) {
+                    ret[i] = matrix[row][min_col];
+                    ++i;
+                }
+                // modify limit
+                ++min_col;
             }
 
-            cur_row += dy;
-            cur_col += dx;
+            // change directions
+            ++cur_dir;
         }
 
         return ret;
