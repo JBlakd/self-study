@@ -13,7 +13,7 @@ class Solution {
     string alienOrder(vector<string>& words) {
         // construct directed graph
         unordered_map<char, vector<char>> adj_list;
-        vector<char> group(words.size(), '$');
+        vector<string> group(words.size(), "$");
 
         // compare words belonging to the same group
         // get length of longest word
@@ -56,9 +56,9 @@ class Solution {
             // second phase, re-group
             for (int i = 0; i < words.size(); ++i) {
                 if (idx - 1 >= words[i].length()) {
-                    group[i] = '$';
+                    group[i] = "$";
                 } else {
-                    group[i] = words[i][idx - 1];
+                    group[i].push_back(words[i][idx - 1]);
                 }
             }
         }
