@@ -63,7 +63,9 @@
         "xlocmon": "cpp",
         "xloctime": "cpp",
         "xmemory0": "cpp",
-        "cassert": "cpp"
+        "cassert": "cpp",
+        "bitset": "cpp",
+        "fstream": "cpp"
     },
     "editor.formatOnSave": true,
     "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 0}"
