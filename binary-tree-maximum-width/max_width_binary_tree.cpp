@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cassert>
 #include <iostream>
 #include <string>
@@ -17,56 +18,42 @@ struct TreeNode {
 class Solution {
    public:
     int widthOfBinaryTree(TreeNode *root) {
-        // find first divergence
-        while (!(root->left != nullptr && root->right != nullptr)) {
-            if (root->left != nullptr) {
-                root = root->left;
-            } else if (root->right != nullptr) {
-                root = root->right;
-            } else {
-                // leaf reached without finding divergence
-                return 1;
-            }
-        }
+        int cur_depth = 0;
+        int cur_id = 1;
+        vector<pair<int, int>> depth_ids;
+        dfs(root, cur_depth, cur_id, depth_ids);
 
-        // simultaneous dfs of left and right branches
-        TreeNode *left = root->left;
-        TreeNode *right = root->right;
-        int left_offset = -1;
-        int right_offset = 1;
-        int ret = 0;
-        dfs(left, right, left_offset, right_offset, ret);
-        return ret;
+        return -1;
     }
 
    private:
-    void dfs(TreeNode *left_node, TreeNode *right_node, int &left_offset, int &right_offset, int &ret) {
-        ret = max(ret, right_offset - left_offset);
-
-        if ((left_node->left == nullptr && left_node->right == nullptr) || (right_node->left == nullptr && right_node->right == nullptr)) {
-            return;
+    void dfs(TreeNode *cur_node, int &cur_depth, int &cur_id, vector<pair<int, int>> &depth_ids) {
+        if (cur_depth >= depth_ids.size()) {
+            depth_ids.emplace_back(cur_id, cur_id);
+        } else {
+            auto &[left, right] = depth_ids[cur_depth];
+            left = min(left, cur_id);
+            right = max(right, cur_id);
         }
 
-        if (left_node->left != nullptr && right_node->right != nullptr) {
-            // Two optimal
-            left_offset = 2 * left_offset;
-            right_offset = 2 * right_offset;
-            dfs(left_node->left, right_node->right, left_offset, right_offset, ret);
-        } else if (left_node->right != nullptr && right_node->right != nullptr) {
-            // One optimal
-            left_offset = 2 * left_offset + 1;
-            right_offset = 2 * right_offset;
-            dfs(left_node->right, right_node->right, left_offset, right_offset, ret);
-        } else if (left_node->left != nullptr && right_node->left != nullptr) {
-            // One optimal
-            left_offset = 2 * left_offset;
-            right_offset = 2 * right_offset - 1;
-            dfs(left_node->left, right_node->left, left_offset, right_offset, ret);
-        } else {
-            // None optimal
-            left_offset = 2 * left_offset + 1;
-            right_offset = 2 * right_offset - 1;
-            dfs(left_node->right, right_node->left, left_offset, right_offset, ret);
+        if (cur_node->left == nullptr && cur_node->right == nullptr) {
+            cout << "depth: " << cur_depth << " id: " << cur_id << '\n';
+        }
+
+        if (cur_node->left != nullptr) {
+            ++cur_depth;
+            cur_id *= 2;
+            dfs(cur_node->left, cur_depth, cur_id, depth_ids);
+            // backtrack
+            --cur_depth;
+            cur_id /= 2;
+        }
+        if (cur_node->right != nullptr) {
+            ++cur_depth;
+            cur_id = 2 * cur_id + 1;
+            dfs(cur_node->right, cur_depth, cur_id, depth_ids);
+            --cur_depth;
+            cur_id = (cur_id - 1) / 2;
         }
     }
 };
