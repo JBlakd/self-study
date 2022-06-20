@@ -46,29 +46,50 @@ class Solution {
                 continue;
             }
 
+            // this word is too short to be abbreviates
             if (words[i].length() <= 3) {
                 ret[i] = words[i];
                 continue;
             }
 
-            // copy, because it needs to be removed
-            unordered_set<int> same_key_words = hashmap[keys[i]];
-            int j;
-            for (j = 0; j < words[i].length(); ++j) {
-                // find divergence by selective removal
-                // TODO: don't use range-based for loop
+            // we have encountered a word that can be abbreviated, but shares the same key with other words
+            // let's iterate through the characters and check for divergence
+            unordered_set<int> words_considering = hashmap[keys[i]];
+            for (int j = 0; j < words[i].length() - 3; ++j) {
+                // document what letters are at the current index in the words that we are considering
+                for (auto& same_key_word_idx : hashmap[keys[i]]) {
+                    if (ret[same_key_word_idx].length() > 0) {
+                        // don't consider already-populated words
+                        continue;
+                    }
+
+                    // is current word unique?
+                    char& cur_word_char = words[same_key_word_idx][j];
+                    bool is_unique = true;
+                    for (auto& other_words_idx : words_considering) {
+                        if (other_words_idx == same_key_word_idx) {
+                            continue;
+                        }
+
+                        if (words[other_words_idx][j] == cur_word_char) {
+                            is_unique = false;
+                            break;
+                        }
+                    }
+
+                    if (is_unique) {
+                        ret[same_key_word_idx] = words[same_key_word_idx].substr(0, j + 1);
+                        ret[same_key_word_idx].append(to_string(words[same_key_word_idx].length() - 2 - j));
+                        ret[same_key_word_idx].push_back(words[same_key_word_idx].back());
+                        words_considering.erase(same_key_word_idx);
+                    }
+                }
             }
 
-            // Currently at first unique character
-            if (words[i].length() - j < 3) {
-                // if abbreviation is not useful, move on to the next word
-                break;
+            // words remaining didn't make the cut to be abbreviated
+            for (auto& word_left : words_considering) {
+                ret[word_left] = words[word_left];
             }
-
-            string abbreviation(words[i].begin(), words[i].begin() + j + 1);
-            abbreviation.append(to_string(words[i].length() - j - 2));
-            abbreviation.push_back(words[i].back());
-            ret[i] = abbreviation;
         }
 
         return ret;
@@ -98,6 +119,15 @@ int main() {
     print_vector(output);
     cout << '\n';
     expected = {"i5s", "interc2s", "intern2s"};
+    for (int i = 0; i < output.size(); ++i) {
+        assert(output[i] == expected[i]);
+    }
+
+    words = {"intuits", "intercoms", "internets", "internbus"};
+    output = solution.wordsAbbreviation(words);
+    print_vector(output);
+    cout << '\n';
+    expected = {"i5s", "interc2s", "internets", "internbus"};
     for (int i = 0; i < output.size(); ++i) {
         assert(output[i] == expected[i]);
     }
