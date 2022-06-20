@@ -53,46 +53,78 @@ class Solution {
             }
 
             // we have encountered a word that can be abbreviated, but shares the same key with other words
-            // let's iterate through the characters and check for divergence
-            unordered_set<int> words_considering = hashmap[keys[i]];
-            for (int j = 0; j < words[i].length() - 3; ++j) {
-                // document what letters are at the current index in the words that we are considering
-                for (auto& same_key_word_idx : hashmap[keys[i]]) {
-                    if (ret[same_key_word_idx].length() > 0) {
-                        // don't consider already-populated words
-                        continue;
+            // let's make a trie with this set
+            unordered_map<string, int> word_map;
+            Node* root = new Node();
+            for (auto& conflict_word_idx : hashmap[keys[i]]) {
+                word_map[words[conflict_word_idx]] = conflict_word_idx;
+                Node* cur_node = root;
+                for (char& c : words[conflict_word_idx]) {
+                    if (cur_node->children[c - 'a'] == nullptr) {
+                        cur_node->children[c - 'a'] = new Node(c);
+                        ++cur_node->num_children;
                     }
-
-                    // is current word unique?
-                    char& cur_word_char = words[same_key_word_idx][j];
-                    bool is_unique = true;
-                    for (auto& other_words_idx : words_considering) {
-                        if (other_words_idx == same_key_word_idx) {
-                            continue;
-                        }
-
-                        if (words[other_words_idx][j] == cur_word_char) {
-                            is_unique = false;
-                            break;
-                        }
-                    }
-
-                    if (is_unique) {
-                        ret[same_key_word_idx] = words[same_key_word_idx].substr(0, j + 1);
-                        ret[same_key_word_idx].append(to_string(words[same_key_word_idx].length() - 2 - j));
-                        ret[same_key_word_idx].push_back(words[same_key_word_idx].back());
-                        words_considering.erase(same_key_word_idx);
-                    }
+                    cur_node = cur_node->children[c - 'a'];
                 }
+                cur_node->is_word = true;
             }
 
-            // words remaining didn't make the cut to be abbreviated
-            for (auto& word_left : words_considering) {
-                ret[word_left] = words[word_left];
-            }
+            // dfs the trie, return until multi-child node reached, then populate the ret
+            // only dfs if ret at current index is empty
+            string cur_string = "";
+            int active_idx = -1;
+            dfs(root, cur_string, active_idx, words, word_map, ret);
         }
 
         return ret;
+    }
+
+   private:
+    struct Node {
+       public:
+        char val;
+        Node* children[26] = {nullptr};
+        int num_children = 0;
+        bool is_word;
+
+        Node() : val('.'), is_word(false) {
+        }
+
+        Node(char c) : val(c), is_word(false) {
+        }
+
+        ~Node() {
+            for (Node* child : children) {
+                delete child;
+            }
+        }
+    };
+
+    void dfs(Node* cur_node, string& cur_string, int& active_idx, vector<string>& words, unordered_map<string, int>& word_map, vector<string>& ret) {
+        if (cur_node->num_children == 0) {
+            active_idx = word_map[cur_string];
+            return;
+        }
+
+        for (Node*& child : cur_node->children) {
+            if (child != nullptr) {
+                cur_string.push_back(child->val);
+                dfs(child, cur_string, active_idx, words, word_map, ret);
+                cur_string.pop_back();
+
+                if (active_idx != -1 && cur_node->num_children > 1) {
+                    // we've returned to a multi-child node. populate ret
+                    if ((words[active_idx].length() - 1) - (cur_string.length() + 1) >= 2) {
+                        ret[active_idx] = words[active_idx].substr(0, cur_string.length() + 1);
+                        ret[active_idx].append(to_string((words[active_idx].length() - 1) - (cur_string.length() + 1)));
+                        ret[active_idx].push_back(words[active_idx].back());
+                    } else {
+                        ret[active_idx] = words[active_idx];
+                    }
+                    active_idx = -1;
+                }
+            }
+        }
     }
 };
 
@@ -114,20 +146,20 @@ int main() {
     vector<string> expected;
     vector<string> output;
 
-    words = {"intuits", "intercoms", "internets"};
-    output = solution.wordsAbbreviation(words);
-    print_vector(output);
-    cout << '\n';
-    expected = {"i5s", "interc2s", "intern2s"};
-    for (int i = 0; i < output.size(); ++i) {
-        assert(output[i] == expected[i]);
-    }
-
     words = {"intuits", "intercoms", "internets", "internbus"};
     output = solution.wordsAbbreviation(words);
     print_vector(output);
     cout << '\n';
     expected = {"i5s", "interc2s", "internets", "internbus"};
+    for (int i = 0; i < output.size(); ++i) {
+        assert(output[i] == expected[i]);
+    }
+
+    words = {"intuits", "intercoms", "internets"};
+    output = solution.wordsAbbreviation(words);
+    print_vector(output);
+    cout << '\n';
+    expected = {"i5s", "interc2s", "intern2s"};
     for (int i = 0; i < output.size(); ++i) {
         assert(output[i] == expected[i]);
     }
