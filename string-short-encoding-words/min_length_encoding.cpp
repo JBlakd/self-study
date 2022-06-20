@@ -8,53 +8,48 @@ using namespace std;
 class Solution {
    public:
     int minimumLengthEncoding(vector<string>& words) {
-        if (words.size() == 1) {
-            return words[0].length() + 1;
-        }
+        // -1 denotes consumed, -2 denotes invalid (but will be in the encoded string)
+        // any other value denotes this word consumd other words and will be in the encoded string
+        vector<int> idx_vec(words.size());
 
-        int active_word_idx = 0;
-        string encoded = "";
-        if (words[1].length() > words[0].length()) {
-            active_word_idx = 1;
-        }
-        encoded.append(words[active_word_idx]);
-        encoded.push_back('#');
+        int exists[26] = {0};
 
         for (int i = 0; i < words.size(); ++i) {
-            if (active_word_idx == i) {
-                continue;
-            }
-            string::reverse_iterator active_word_it = words[active_word_idx].rbegin();
-            string::reverse_iterator cur_word_it = words[i].rbegin();
-            while (cur_word_it < words[i].rend() && active_word_it < words[active_word_idx].rend()) {
-                if (*active_word_it == *cur_word_it) {
-                    ++cur_word_it;
-                    ++active_word_it;
-                } else {
-                    break;
+            idx_vec[i] = words[i].length() - 1;
+        }
+
+        // each iteration of this loop deals with one letter of every word
+        while (true) {
+            // count one letters from every word, and increment its count
+            for (int i = 0; i < words.size(); ++i) {
+                if (idx_vec[i] < 0) {
+                    // disregard words which have been completed or invalidated
+                    continue;
                 }
+                ++exists[words[i][idx_vec[i]] - 'a'];
             }
 
-            // no words reached the end
-            if (cur_word_it != words[i].rend() && active_word_it != words[active_word_idx].rend()) {
-                // passing of the torch
-                active_word_idx = i;
-                encoded.append(words[active_word_idx]);
-                encoded.push_back('#');
-                continue;
-            }
+            // TODO: middle logic and also break condition
 
-            // also pass the torch if the current active word has been exhausted
-            if (active_word_it == words[active_word_idx].rend()) {
-                active_word_idx = i;
-                encoded.append(words[active_word_idx]);
-                encoded.push_back('#');
+            // for each word, move onto the next letter
+            for (int i = 0; i < words.size(); ++i) {
+                if (idx_vec[i] < 0) {
+                    // disregard words which have been completed or invalidated
+                    continue;
+                }
+                // we're about to leave this letter behind, so decrement its count
+                --exists[words[i][idx_vec[i]] = 'a'];
+                --idx_vec[i];
             }
         }
 
-        // cout << encoded << ' ';
-
-        return encoded.length();
+        int ret = 0;
+        for (int i = 0; i < words.size(); ++i) {
+            if (idx_vec[i] == -2 || idx_vec[i] >= 0) {
+                ret += words[i].length() + 1;
+            }
+        }
+        return ret;
     }
 };
 
@@ -75,11 +70,11 @@ int main() {
     vector<string> words;
     int output;
 
-    // qwosp#grah# 11
-    words = {"p", "grah", "qwosp"};
+    // qwosp#grahp# 12
+    words = {"p", "grahp", "qwosp"};
     output = solution.minimumLengthEncoding(words);
     cout << output << '\n';
-    assert(output == 11);
+    assert(output == 12);
 
     // chime#bell# 11
     words = {"chime", "ime", "me", "bell"};
