@@ -9,70 +9,66 @@ using namespace std;
 class Solution {
    public:
     int minimumLengthEncoding(vector<string>& words) {
-        // preprocess words: remove duplicates
-        unordered_set<string> unique;
-        for (auto& word : words) {
-            unique.emplace(word);
-        }
-        words = vector<string>(unique.begin(), unique.end());
+        // New concept unlocked: backwards trie
+        root = new Node();
 
-        // -1 denotes consumed, -2 denotes invalid (but will be in the encoded string)
-        // any other value denotes this word consumd other words and will be in the encoded string
-        vector<int> idx_vec(words.size());
-
-        int exists[26] = {0};
-
-        for (int i = 0; i < words.size(); ++i) {
-            idx_vec[i] = words[i].length() - 1;
+        for (string& word : words) {
+            Node* cur_node = root;
+            for (int i = word.length() - 1; i >= 0; --i) {
+                if (cur_node->children[word[i] - 'a'] == nullptr) {
+                    cur_node->children[word[i] - 'a'] = new Node(word[i]);
+                }
+                cur_node = cur_node->children[word[i] - 'a'];
+            }
+            cur_node->is_word = true;
         }
 
-        // each iteration of this loop deals with one letter of every word
-        while (true) {
-            bool finished = true;
-            // count one letters from every word, and increment its count
-            for (int i = 0; i < words.size(); ++i) {
-                if (idx_vec[i] < 0) {
-                    // disregard words which have been completed or invalidated
-                    continue;
-                }
-                finished = false;
-                ++exists[words[i][idx_vec[i]] - 'a'];
-            }
-
-            if (finished) {
-                break;
-            }
-
-            // for each word, invalidate if its current letter isn't shared by any other
-            for (int i = 0; i < words.size(); ++i) {
-                if (idx_vec[i] < 0) {
-                    // disregard words which have been completed or invalidated
-                    continue;
-                }
-                if (exists[words[i][idx_vec[i]] - 'a'] == 1) {
-                    idx_vec[i] = -2;
-                }
-            }
-
-            // for each word, move onto the next letter
-            for (int i = 0; i < words.size(); ++i) {
-                if (idx_vec[i] < 0) {
-                    // disregard words which have been completed or invalidated
-                    continue;
-                }
-                // we're about to leave this letter behind, so decrement its count
-                --exists[words[i][idx_vec[i]] - 'a'];
-                --idx_vec[i];
-            }
-        }
-
+        // dfs for leaf nodes which are also words
         int ret = 0;
-        for (int i = 0; i < words.size(); ++i) {
-            if (idx_vec[i] == -2 || idx_vec[i] >= 0) {
-                ret += words[i].length() + 1;
+        int cur_depth = 0;
+        dfs(root, cur_depth, ret);
+
+        return ret;
+    }
+
+   private:
+    struct Node {
+       public:
+        char val;
+        Node* children[26] = {nullptr};
+        bool is_word;
+
+        Node() : val('.'), is_word(false) {
+        }
+
+        Node(char c) : val(c), is_word(false) {
+        }
+
+        ~Node() {
+            for (Node* child : children) {
+                delete child;
             }
         }
-        return ret;
+    };
+
+    Node* root = nullptr;
+
+    void dfs(Node* cur_node, int& cur_depth, int& ret) {
+        bool has_child = false;
+
+        // visit children
+        for (Node*& child : cur_node->children) {
+            if (child != nullptr) {
+                has_child = true;
+                ++cur_depth;
+                dfs(child, cur_depth, ret);
+                --cur_depth;
+            }
+        }
+
+        if (!has_child && cur_node->is_word) {
+            ret += cur_depth + 1;
+        }
     }
 };
 
