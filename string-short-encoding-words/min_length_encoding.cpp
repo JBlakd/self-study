@@ -1,6 +1,7 @@
 #include <cassert>
 #include <iostream>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 using namespace std;
@@ -8,6 +9,13 @@ using namespace std;
 class Solution {
    public:
     int minimumLengthEncoding(vector<string>& words) {
+        // preprocess words: remove duplicates
+        unordered_set<string> unique;
+        for (auto& word : words) {
+            unique.emplace(word);
+        }
+        words = vector<string>(unique.begin(), unique.end());
+
         // -1 denotes consumed, -2 denotes invalid (but will be in the encoded string)
         // any other value denotes this word consumd other words and will be in the encoded string
         vector<int> idx_vec(words.size());
@@ -20,16 +28,31 @@ class Solution {
 
         // each iteration of this loop deals with one letter of every word
         while (true) {
+            bool finished = true;
             // count one letters from every word, and increment its count
             for (int i = 0; i < words.size(); ++i) {
                 if (idx_vec[i] < 0) {
                     // disregard words which have been completed or invalidated
                     continue;
                 }
+                finished = false;
                 ++exists[words[i][idx_vec[i]] - 'a'];
             }
 
-            // TODO: middle logic and also break condition
+            if (finished) {
+                break;
+            }
+
+            // for each word, invalidate if its current letter isn't shared by any other
+            for (int i = 0; i < words.size(); ++i) {
+                if (idx_vec[i] < 0) {
+                    // disregard words which have been completed or invalidated
+                    continue;
+                }
+                if (exists[words[i][idx_vec[i]] - 'a'] == 1) {
+                    idx_vec[i] = -2;
+                }
+            }
 
             // for each word, move onto the next letter
             for (int i = 0; i < words.size(); ++i) {
@@ -38,7 +61,7 @@ class Solution {
                     continue;
                 }
                 // we're about to leave this letter behind, so decrement its count
-                --exists[words[i][idx_vec[i]] = 'a'];
+                --exists[words[i][idx_vec[i]] - 'a'];
                 --idx_vec[i];
             }
         }
@@ -69,6 +92,30 @@ int main() {
     Solution solution;
     vector<string> words;
     int output;
+
+    // climb#
+    words = {"climb", "limb", "climb", "climb"};
+    output = solution.minimumLengthEncoding(words);
+    cout << output << '\n';
+    assert(output == 6);
+
+    // time#
+    words = {"time", "time", "time", "time"};
+    output = solution.minimumLengthEncoding(words);
+    cout << output << '\n';
+    assert(output == 5);
+
+    // climb#
+    words = {"climb", "limb"};
+    output = solution.minimumLengthEncoding(words);
+    cout << output << '\n';
+    assert(output == 6);
+
+    // time#
+    words = {"time"};
+    output = solution.minimumLengthEncoding(words);
+    cout << output << '\n';
+    assert(output == 5);
 
     // qwosp#grahp# 12
     words = {"p", "grahp", "qwosp"};
