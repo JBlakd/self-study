@@ -29,19 +29,22 @@ class Solution {
             q.pop();
             cur_sum -= cur_largest;
 
-            // instead of subtracting cur_sum once from cur_largest
-            // subtract as much as you can so that afterwards, cur_largest isn't the largest
-            int difference = cur_largest - q.top();
-            int quotient = difference / cur_sum;
-            if (difference % cur_sum == 0 && quotient > 0) {
-                cur_largest -= (quotient * cur_sum);
-            } else {
-                cur_largest -= ((quotient + 1) * cur_sum);
-            }
+            if (cur_largest > cur_sum + 1) {
+                cur_largest %= cur_sum;
+                if (cur_largest == 0) {
+                    if (cur_sum == 1) {
+                        return true;
 
-            if (cur_largest < 1) {
+                    } else {
+                        return false;
+                    }
+                }
+            } else if (cur_largest == cur_sum + 1) {
+                cur_largest = 1;
+            } else {
                 return false;
             }
+
             q.emplace(cur_largest);
             cur_sum += cur_largest;
         }
@@ -66,6 +69,15 @@ int main() {
     Solution solution;
     vector<int> target;
 
+    target = {8, 5};
+    assert(solution.isPossible(target) == true);
+
+    target = {2, 900000003};
+    assert(solution.isPossible(target) == true);
+
+    target = {2, 900000002};
+    assert(solution.isPossible(target) == false);
+
     target = {9, 9, 9};
     assert(solution.isPossible(target) == false);
 
@@ -73,9 +85,6 @@ int main() {
     assert(solution.isPossible(target) == true);
 
     target = {9, 3, 5};
-    assert(solution.isPossible(target) == true);
-
-    target = {8, 5};
     assert(solution.isPossible(target) == true);
 
     target = {1, 1, 1, 2};
