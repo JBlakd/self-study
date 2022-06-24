@@ -11,23 +11,7 @@ using namespace std;
 class Solution {
    public:
     bool isPossible(vector<int>& target) {
-        // it ain't this simple, see {5,8} testcase
-        sort(target.begin(), target.end());
-
-        vector<int> cur_vec(target.size(), 1);
-        int cur_sum = target.size();
-        for (int i = 0; i < target.size(); ++i) {
-            while (cur_vec[i] < target[i]) {
-                int change = cur_sum - cur_vec[i];
-                cur_vec[i] += change;
-                cur_sum += change;
-            }
-            if (cur_vec[i] > target[i]) {
-                return false;
-            }
-        }
-
-        return true;
+        // Subtract the largest with the rest of the array, and put the new element into the array. Repeat until all elements become one
     }
 };
 
