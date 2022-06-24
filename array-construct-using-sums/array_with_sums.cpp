@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cassert>
 #include <iostream>
+#include <queue>
 #include <string>
 #include <vector>
 
@@ -12,6 +13,28 @@ class Solution {
    public:
     bool isPossible(vector<int>& target) {
         // Subtract the largest with the rest of the array, and put the new element into the array. Repeat until all elements become one
+
+        priority_queue<int> q;
+        int cur_sum = 0;
+        for (int& num : target) {
+            q.emplace(num);
+            cur_sum += num;
+        }
+
+        while (cur_sum > target.size()) {
+            int cur_largest = q.top();
+            q.pop();
+            cur_sum -= cur_largest;
+
+            cur_largest -= cur_sum;
+            if (cur_largest < 1) {
+                return false;
+            }
+            q.emplace(cur_largest);
+            cur_sum += cur_largest;
+        }
+
+        return true;
     }
 };
 
