@@ -13,7 +13,7 @@ class Solution {
     cols = n;
     // each state comprises of the current location (rows, cols) plus moves left. Therefore the state is 3D
     // -1 denotes unvisited state
-    vector<vector<vector<uint64_t>>> dp(rows, vector<vector<uint64_t>>(cols, vector<uint64_t>(maxMove + 1, 0)));
+    vector<vector<vector<uint64_t>>> dp(rows, vector<vector<uint64_t>>(cols, vector<uint64_t>(maxMove + 1, numeric_limits<uint64_t>::max())));
     return (int)(dfs(startRow, startColumn, maxMove, dp) % (1000000007));
   }
 
@@ -34,7 +34,7 @@ class Solution {
       return 0;
     }
     // or we've reached a previously visited and memoized state
-    if (dp[cur_row][cur_col][moves_left] != 0) {
+    if (dp[cur_row][cur_col][moves_left] != numeric_limits<uint64_t>::max()) {
       return dp[cur_row][cur_col][moves_left];
     }
 
