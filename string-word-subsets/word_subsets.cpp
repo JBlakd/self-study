@@ -8,35 +8,43 @@ using namespace std;
 class Solution {
  public:
   vector<string> wordSubsets(vector<string>& words1, vector<string>& words2) {
-    vector<vector<int>> hashmaps_ref(words1.size(), vector<int>(26, 0));
-    for (int i = 0; i < words1.size(); ++i) {
-      for (char& c : words1[i]) {
-        ++hashmaps_ref[i][c - 'a'];
+    // Reduce all words in words2 to single word
+    vector<int> words2_master_ref(26, 0);
+    for (string& word2 : words2) {
+      vector<int> cur_word2_hashmap(26, 0);
+      // populate current word's hashmap
+      for (char& c : word2) {
+        ++cur_word2_hashmap[c - 'a'];
+      }
+
+      // populate the master hashmap
+      for (int i = 0; i < 26; ++i) {
+        words2_master_ref[i] = max(words2_master_ref[i], cur_word2_hashmap[i]);
       }
     }
 
     vector<string> ret;
-    vector<vector<int>> hashmaps_mutable(words1.size(), vector<int>(26, 0));
-    for (int i = 0; i < words1.size(); ++i) {
-      bool is_cur_word_valid = true;
+    for (string& word1 : words1) {
+      bool is_valid = true;
+      vector<int> words2_master_copy(words2_master_ref);
 
-      for (string& word2 : words2) {
-        // reset current hashmap
-        copy(begin(hashmaps_ref[i]), end(hashmaps_ref[i]), begin(hashmaps_mutable[i]));
-        for (char& c : word2) {
-          --hashmaps_mutable[i][c - 'a'];
-          if (hashmaps_mutable[i][c - 'a'] == -1) {
-            is_cur_word_valid = false;
-            break;
-          }
-        }
-        if (!is_cur_word_valid) {
+      // create cur word1's hashmap
+      vector<int> words1_cur_ref(26, 0);
+      for (char& c : word1) {
+        ++words1_cur_ref[c - 'a'];
+      }
+
+      // checking
+      for (int i = 0; i < 26; ++i) {
+        words1_cur_ref[i] -= words2_master_copy[i];
+        if (words1_cur_ref[i] < 0) {
+          is_valid = false;
           break;
         }
       }
 
-      if (is_cur_word_valid) {
-        ret.push_back(words1[i]);
+      if (is_valid) {
+        ret.push_back(word1);
       }
     }
 
