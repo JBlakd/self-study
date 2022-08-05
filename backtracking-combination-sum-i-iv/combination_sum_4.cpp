@@ -9,31 +9,26 @@ using namespace std;
 class Solution {
  public:
   int combinationSum4(vector<int>& nums, int target) {
-    // Sort to be able to prune
+    // this a DP problem mane
     sort(nums.begin(), nums.end());
-    int ret = 0;
-    for (int i = 0; i < nums.size(); ++i) {
-      dfs(nums, i, target - nums[i], ret);
-    }
-    return ret;
-  }
 
- private:
-  void dfs(vector<int>& nums, int cur_idx, int target, int& ret) {
-    // cout << "target: " << target << '\n';
-    if (target == 0) {
-      ++ret;
-      // cout << "ret: " << ret << '\n';
-      return;
-    }
+    // initialise dp array, target from index 0 to index target
+    vector<uint32_t> dp(target + 1, 0);
+    // the empty array is the sole way to form a target of 0
+    dp[0] = 1;
+    for (int cur_target = 1; cur_target <= target; ++cur_target) {
+      // for each target value, explore each num
+      for (int& num : nums) {
+        // but only if it's smaller or equal to the target
+        if (num > cur_target) {
+          break;
+        }
 
-    for (int i = 0; i < nums.size(); ++i) {
-      if (target - nums[i] < 0) {
-        // break because nums is sorted, and any element beyond nums[i] would be a bust
-        break;
+        dp[cur_target] += dp[cur_target - num];
       }
-      dfs(nums, i, target - nums[i], ret);
     }
+
+    return (int)dp[target];
   }
 };
 
