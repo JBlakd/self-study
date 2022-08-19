@@ -18,7 +18,7 @@ class Solution {
       jobseekers_set.emplace(jobseeker);
     }
 
-    unordered_set<int> companies_ending_with;
+    unordered_multiset<int> companies_ending_with;
     int i = 0;
     while (!jobseekers_set.empty()) {
       int cur_jobseeker = jobseekers[i];
@@ -29,7 +29,7 @@ class Solution {
 
       if (companies_ending_with.find(cur_jobseeker - 1) != companies_ending_with.end()) {
         // firstly, try to join an existing company
-        companies_ending_with.erase(cur_jobseeker - 1);
+        companies_ending_with.erase(companies_ending_with.find(cur_jobseeker - 1));
         companies_ending_with.emplace(cur_jobseeker);
       } else if (jobseekers_set.find(cur_jobseeker + 1) != jobseekers_set.end() && jobseekers_set.find(cur_jobseeker + 2) != jobseekers_set.end()) {
         // otherwise, try to start a new company with two other consecutive fellows
