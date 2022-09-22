@@ -11,8 +11,8 @@ class Solution {
     int front = 0;
     int back = -1;
 
-    while (front < s.length()) {
-      if (s[front] != ' ') {
+    while (front <= s.length()) {
+      if (front < s.length() && s[front] != ' ') {
         ++front;
         continue;
       }
