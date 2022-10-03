@@ -8,19 +8,27 @@ using namespace std;
 class Solution {
  public:
   int minCost(string colors, vector<int>& neededTime) {
-    int ret = 0;
-
-    for (int i = 0; i < neededTime.size() - 1; ++i) {
-      if (colors[i] == colors[i + 1]) {
-        if (neededTime[i] < neededTime[i + 1]) {
-          ret += neededTime[i];
-        } else {
-          ret += neededTime[i + 1];
-        }
-      }
+    if (colors.length() == 1) {
+      return 0;
     }
 
-    return ret;
+    // keep the maximum of each group
+    int total_time = neededTime[0];
+    int group_max_summed = 0;
+    int cur_group_max = neededTime[0];
+    for (int i = 1; i < colors.length(); ++i) {
+      total_time += neededTime[i];
+
+      if (colors[i] != colors[i - 1]) {
+        group_max_summed += cur_group_max;
+        cur_group_max = neededTime[i];
+      } else {
+        cur_group_max = max(cur_group_max, neededTime[i]);
+      }
+    }
+    group_max_summed += cur_group_max;
+
+    return total_time - group_max_summed;
   }
 };
 
@@ -38,8 +46,15 @@ void print_vector(vector<T> vec) {
 
 int main() {
   Solution solution;
+  string colors;
+  vector<int> neededTime;
+  int output;
 
-  /* UNIT TESTS HERE */
+  colors = "abaac";
+  neededTime = {1, 2, 3, 4, 5};
+  output = solution.minCost(colors, neededTime);
+  cout << output << '\n';
+  assert(output == 3);
 
   cout << "Great success!" << '\n';
 }
